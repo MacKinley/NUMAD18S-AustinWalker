@@ -2,5 +2,7 @@
     <string name="app_name">NUMAD18S-AustinWalker</string>
     <string name="hello_mad">Hello MAD</string>
     <string name="about_label">About</string>
+    <string name="ok_label">OK</string>
+    <string name="about_text">Put something here</string>
     <string name="crash_label">Crash App</string>
 </resources>

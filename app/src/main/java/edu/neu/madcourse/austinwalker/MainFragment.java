@@ -1,22 +1,24 @@
 package edu.neu.madcourse.austinwalker;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class MainFragment extends Fragment {
-    private AlertDialog mDialog;
+
+    final static String tag = "MainFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Handle buttons
+        // About button listener
         View aboutButton = rootView.findViewById(R.id.about_button);
         aboutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -26,6 +28,7 @@ public class MainFragment extends Fragment {
             }
         });
 
+        // Crash button listener
         View crashButton = rootView.findViewById(R.id.crash_button);
         crashButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,12 +40,22 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
+    public void onResume() {
+        super.onResume();
 
-        // Don't keep the about dialog up
-        if (mDialog != null)
-            mDialog.dismiss();
+        // Show the version info
+        try {
+            String packageName = getActivity().getPackageName();
+            String versionName = getActivity().getPackageManager().getPackageInfo(packageName, 0).versionName;
+            int versionCode = getActivity().getPackageManager().getPackageInfo(packageName, 0).versionCode;
+            String versionCodeStr = Integer.toString(versionCode);
+
+            TextView versionText = (TextView) getActivity().findViewById(R.id.version_text);
+            versionText.setText("Version " + versionCodeStr + ": \"" + versionName + "\"");
+
+
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(tag, "No such package name");
+        }
     }
 }

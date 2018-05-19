@@ -19,4 +19,11 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="@string/about_text" />
+
+    <TextView
+        android:id="@+id/imei_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/imei_text" />
 </LinearLayout>

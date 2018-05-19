@@ -13,10 +13,23 @@
         android:scaleType="centerInside"
         android:src="@drawable/head_shot" />
 
-    <TextView
-        android:id="@+id/about_text"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/about_text" />
+        android:gravity="center_vertical|center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/about_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/about_text" />
+
+        <TextView
+            android:id="@+id/imei_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/imei_text" />
+    </LinearLayout>
+
 </LinearLayout>

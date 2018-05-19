@@ -26,6 +26,14 @@ public class MainFragment extends Fragment {
             }
         });
 
+        View crashButton = rootView.findViewById(R.id.crash_button);
+        crashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                throw new NullPointerException("You made me crash!");
+            }
+        });
+
         return rootView;
     }
 

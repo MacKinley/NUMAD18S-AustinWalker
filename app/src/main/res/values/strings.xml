@@ -3,6 +3,11 @@
     <string name="hello_mad">Hello MAD</string>
     <string name="about_label">About</string>
     <string name="ok_label">OK</string>
-    <string name="about_text">Put something here</string>
+    <string name="about_text">
+        Name: Austin Walker \n
+        Email: awalker@ccs.neu.edu \n
+        Year: 2
+    </string>
+    <string name="imei_text">Phone IMEI: null</string>
     <string name="crash_label">Crash App</string>
 </resources>

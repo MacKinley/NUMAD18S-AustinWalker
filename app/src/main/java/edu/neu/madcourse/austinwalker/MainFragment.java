@@ -3,6 +3,7 @@ package edu.neu.madcourse.austinwalker;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +34,12 @@ public class MainFragment extends Fragment {
         crashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                throw new NullPointerException("You made me crash!");
+                String testLabSetting = Settings.System.getString(getActivity().getContentResolver(), "firebase.test.lab");
+                if (testLabSetting != null && "true".equals(testLabSetting)) {
+                    // Do nothing
+                } else {
+                    throw new NullPointerException("You sunk my battleship!");
+                }
             }
         });
 

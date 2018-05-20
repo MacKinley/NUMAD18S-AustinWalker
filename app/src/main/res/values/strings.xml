@@ -4,9 +4,7 @@
     <string name="about_label">About</string>
     <string name="ok_label">OK</string>
     <string name="about_text">
-        Name: Austin Walker \n
-        Year: 2 \n
-        Email: awalker@ccs.neu.edu
+        Name: Austin Walker \nYear: 2 \nEmail: awalker@ccs.neu.edu
     </string>
     <string name="imei_text">Phone IMEI: </string>
     <string name="crash_label">Crash App</string>

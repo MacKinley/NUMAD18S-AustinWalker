@@ -17,6 +17,8 @@
         android:id="@+id/about_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:paddingTop="@dimen/text_margin"
         android:gravity="center_horizontal"
         android:text="@string/about_text" />
 
@@ -24,6 +26,7 @@
         android:id="@+id/imei_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/text_margin"
         android:gravity="center_horizontal"
         android:text="@string/imei_text" />
 </LinearLayout>

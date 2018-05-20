@@ -51,7 +51,7 @@ public class MainFragment extends Fragment {
             String versionCodeStr = Integer.toString(versionCode);
 
             TextView versionText = (TextView) getActivity().findViewById(R.id.version_text);
-            versionText.setText("Version " + versionCodeStr + ": \"" + versionName + "\"");
+            versionText.setText("Version " + versionName + " (# " + versionCodeStr + ")");
 
 
         } catch (PackageManager.NameNotFoundException e) {

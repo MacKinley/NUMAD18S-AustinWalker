@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
@@ -8,18 +9,20 @@
     <ImageView
         android:id="@+id/head_shot"
         android:layout_width="match_parent"
+
         android:layout_height="@dimen/head_shot_size"
         android:gravity="top"
-        android:src="@drawable/head_shot"
-        android:scaleType="centerInside"/>
+        android:scaleType="centerInside"
+
+        android:src="@drawable/head_shot" />
 
     <TextView
         android:id="@+id/about_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
-        android:paddingTop="@dimen/text_margin"
         android:gravity="center_horizontal"
+        android:paddingTop="@dimen/text_margin"
         android:text="@string/about_text" />
 
     <TextView

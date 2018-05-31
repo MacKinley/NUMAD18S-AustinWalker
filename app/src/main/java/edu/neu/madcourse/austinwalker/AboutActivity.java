@@ -11,6 +11,9 @@ import android.telephony.TelephonyManager;
 import android.widget.TextView;
 
 public class AboutActivity extends AppCompatActivity {
+
+    static String imeiStr = "null";
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
@@ -19,24 +22,27 @@ public class AboutActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         TextView imei = (TextView) findViewById(R.id.imei_text);
-        String imeiStr = imei.getText().toString();
-        imei.setText(imeiStr + " " + getDeviceIMEI());
+
+        // Get device IMEI or show null if not allowed
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(AboutActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
+        }
+
+        String imeiLabel = getResources().getString(R.string.imei_text);
+        imei.setText(imeiLabel + " " + imeiStr);
     }
 
-    public String getDeviceIMEI() {
-        String identifier = null;
-        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        if (null != tm) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: ask for permissions
-                return "null";
-            }
-            identifier = tm.getDeviceId();
-        }
-        if (null == identifier || 0 == identifier.length()) {
-            identifier = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+                    imeiStr = tm.getDeviceId();
+                }
 
-        return identifier;
+                return;
+            }
+        }
     }
 }

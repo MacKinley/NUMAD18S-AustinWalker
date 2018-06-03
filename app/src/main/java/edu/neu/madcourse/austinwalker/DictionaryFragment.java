@@ -1,15 +1,13 @@
 package edu.neu.madcourse.austinwalker;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +15,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-
-import edu.neu.madcourse.austinwalker.AboutActivity;
-import edu.neu.madcourse.austinwalker.DictionaryActivity;
-import edu.neu.madcourse.austinwalker.R;
 
 public class DictionaryFragment extends Fragment {
 
@@ -42,19 +36,22 @@ public class DictionaryFragment extends Fragment {
         final EditText textInput = rootView.findViewById(R.id.dictionary_edit_text);
         textInput.addTextChangedListener(new TextWatcher() {
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String text = s.toString();
+
+                if (count > 3 && checkDictionaryWord(text)) {
+                    wordList.add(0, text);
+                    beep();
+                    printWordList();
+                }
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
-                String text = s.toString();
-
-                if (checkDictionaryWord(text)) {
-                    wordList.add(0, text);
-                    beep();
-                    textInput.setText("");
-                    printWordList();
-                }
             }
         });
 
@@ -91,7 +88,15 @@ public class DictionaryFragment extends Fragment {
 
     // Placeholder
     private boolean checkDictionaryWord(String word) {
-        return word.equals("hello") || word.equals("goodbye");
+        MyApplication myApp = (MyApplication) this.getActivity().getApplication();
+        SQLiteDatabase wordDb = myApp.dictionaryDb;
+
+        Cursor cursor = wordDb.rawQuery("select word from words where word = ?", new String[]{word});
+
+        boolean found = (cursor.getCount() == 1);
+        cursor.close();
+
+        return found;
     }
 
     private void beep() {

@@ -19,6 +19,16 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        // Dictionary button listener
+        View dictionaryButton = rootView.findViewById(R.id.dictionary_button);
+        dictionaryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), DictionaryActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
+
         // About button listener
         View aboutButton = rootView.findViewById(R.id.about_button);
         aboutButton.setOnClickListener(new View.OnClickListener() {

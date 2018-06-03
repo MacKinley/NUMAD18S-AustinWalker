@@ -13,8 +13,7 @@
         android:layout_height="@dimen/dict_text_box_height"
         android:layout_marginBottom="50dp"
         android:background="@drawable/menu_background"
-        android:padding="@dimen/menu_padding"
-        android:text="This is a test!!!!" />
+        android:padding="@dimen/menu_padding" />
 
     <LinearLayout
         android:layout_width="match_parent"

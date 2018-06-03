@@ -21,6 +21,9 @@
         <activity
             android:name=".DictionaryActivity"
             android:label="@string/dictionary_activity" />
+        <activity
+            android:name=".CreditsActivity"
+            android:label="Acknowledgements" />
 
     </application>
 

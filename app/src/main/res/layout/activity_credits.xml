@@ -1,0 +1,21 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:clipChildren="false"
+    tools:context=".CreditsActivity">
+
+    <TextView
+        android:background="@drawable/menu_background"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=
+            "How to generate a beep:\nhttps://stackoverflow.com/questions/12154940/how-to-make-a-beep-in-android
+\n\nPackage for loading dictionary database:\nhttps://github.com/jgilfelt/android-sqlite-asset-helper
+\n\nDatabase management using the main Application:\nhttps://stackoverflow.com/questions/6356170/how-should-i-open-and-close-my-database-properly
+\n\nTheme and button design adapted from Hello, Android TicTacToe example" />
+
+
+</FrameLayout>

@@ -62,13 +62,11 @@ public class DictionaryFragment extends Fragment {
 
     public void onResume() {
         super.onResume();
-
         printWordList();
     }
 
     private void printWordList() {
         StringBuilder words = new StringBuilder();
-
         TextView wordListView = (TextView) getView().findViewById(R.id.dictionary_word_list);
 
         for (String word : wordList)
@@ -88,7 +86,7 @@ public class DictionaryFragment extends Fragment {
         wordList.clear();
     }
 
-    // Placeholder
+    // See if the text is in our dictionary db
     private boolean checkDictionaryWord(String word) {
         MyApplication myApp = (MyApplication) this.getActivity().getApplication();
         SQLiteDatabase wordDb = myApp.dictionaryDb;

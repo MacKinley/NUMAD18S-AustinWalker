@@ -43,7 +43,7 @@ public class DictionaryFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String text = s.toString();
 
-                if (count >= 3 && checkDictionaryWord(text)) {
+                if (before != 0 && count >= 3 && checkDictionaryWord(text)) {
                     wordList.add(0, text);
                     beep();
                     printWordList();

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 
 public class DictionaryFragment extends Fragment {
 
+    final String TAG = "DictionaryFragment";
     static ArrayList<String> wordList = new ArrayList<String>();
 
     @Override
@@ -100,7 +102,11 @@ public class DictionaryFragment extends Fragment {
     }
 
     private void beep() {
-        ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
-        beep.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 300);
+        try {
+            ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
+            beep.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 300);
+        } catch (RuntimeException e) {
+            Log.d(TAG, "Can't generate tone!");
+        }
     }
 }

@@ -91,7 +91,7 @@ public class DictionaryFragment extends Fragment {
         MyApplication myApp = (MyApplication) this.getActivity().getApplication();
         SQLiteDatabase wordDb = myApp.dictionaryDb;
 
-        Cursor cursor = wordDb.rawQuery("select word from words where word = ?", new String[]{word});
+        Cursor cursor = wordDb.rawQuery("SELECT word FROM words WHERE word = ? COLLATE NOCASE", new String[]{word});
 
         boolean found = (cursor.getCount() == 1);
         cursor.close();

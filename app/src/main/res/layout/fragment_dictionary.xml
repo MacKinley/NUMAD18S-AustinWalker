@@ -11,7 +11,7 @@
         android:id="@+id/dictionary_word_list"
         android:layout_width="@dimen/dict_text_box_width"
         android:layout_height="@dimen/dict_text_box_height"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="@dimen/dict_text_margin"
         android:background="@drawable/menu_background"
         android:padding="@dimen/menu_padding" />
 
@@ -23,7 +23,7 @@
         android:orientation="vertical">
 
         <EditText
-            android:layout_width="150dp"
+            android:layout_width="@dimen/dict_edit_width"
             android:id="@+id/dictionary_edit_text"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />

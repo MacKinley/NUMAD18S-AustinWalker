@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:elevation="@dimen/elevation_high"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="@dimen/menu_padding"
     tools:context="edu.neu.madcourse.austinwalker.DictionaryActivity">
 
@@ -13,18 +13,21 @@
         android:layout_height="@dimen/dict_text_box_height"
         android:layout_marginBottom="@dimen/dict_text_margin"
         android:background="@drawable/menu_background"
+        android:elevation="@dimen/elevation_high"
         android:padding="@dimen/menu_padding" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/dict_text_box_height"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/dict_text_margin"
         android:background="@drawable/menu_background"
         android:elevation="@dimen/elevation_high"
         android:orientation="vertical">
 
         <EditText
-            android:layout_width="150dp"
             android:id="@+id/dictionary_edit_text"
+            android:layout_width="@dimen/dict_edit_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
 

@@ -6,7 +6,7 @@ android {
         applicationId "edu.neu.madcourse.austinwalker"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 2001
+        versionCode 2002
         versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

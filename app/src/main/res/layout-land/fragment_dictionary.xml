@@ -11,7 +11,6 @@
         android:id="@+id/dictionary_word_list"
         android:layout_width="@dimen/dict_text_box_width"
         android:layout_height="@dimen/dict_text_box_height"
-        android:layout_marginBottom="@dimen/dict_text_margin"
         android:background="@drawable/menu_background"
         android:elevation="@dimen/elevation_high"
         android:padding="@dimen/menu_padding" />

@@ -37,7 +37,7 @@
 
     <LinearLayout
         android:id="@+id/EnterTextLayout"
-        android:layout_width="200dp"
+        android:layout_width="@dimen/dictionary_width"
         android:layout_height="wrap_content"
         android:layout_marginEnd="48dp"
         android:background="@drawable/menu_background"
@@ -51,7 +51,7 @@
 
         <EditText
             android:id="@+id/dictionary_edit_text"
-            android:layout_width="@dimen/dict_edit_width"
+            android:layout_width="@dimen/dictionary_text_entry_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
 

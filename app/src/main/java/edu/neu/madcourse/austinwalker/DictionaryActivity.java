@@ -13,7 +13,7 @@ public class DictionaryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dictionary);
 
-        // Acknowledgements button
+        // Acknowledgments button
         View ackButton = findViewById(R.id.ack_button);
         ackButton.setOnClickListener(new View.OnClickListener() {
             @Override

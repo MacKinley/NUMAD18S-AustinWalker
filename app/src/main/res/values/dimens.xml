@@ -4,6 +4,7 @@
     <dimen name="stroke_width">1dp</dimen>
     <dimen name="corner_radius">4dp</dimen>
     <dimen name="menu_padding">10dp</dimen>
+    <dimen name="head_shot_margin">25dp</dimen>
     <dimen name="menu_space">10dp</dimen>
     <dimen name="menu_text_size">32sp</dimen>
     <dimen name="menu_button_margin">2dp</dimen>
@@ -11,5 +12,4 @@
     <dimen name="text_margin">10dp</dimen>
     <dimen name="dictionary_width">200dp</dimen>
     <dimen name="dictionary_text_entry_width">150dp</dimen>
-    <dimen name="head_shot_size">225dp</dimen>
 </resources>

@@ -6,7 +6,7 @@
     <string name="clear_label">Clear</string>
     <string name="ack_label">Acknowledgments</string>
     <string name="about_text">
-        Name: Austin Walker \nYear: 2 \nEmail: awalker@ccs.neu.edu
+        Name: Austin Walker \nEmail: awalker@ccs.neu.edu\n\nI\'m a second year master\'s student and fulltime software engineer at DellEMC where I work in storage systems.
     </string>
     <string name="imei_text">Phone IMEI: </string>
     <string name="crash_label">Crash App</string>

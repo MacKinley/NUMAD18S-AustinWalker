@@ -1,6 +1,7 @@
 <resources>
     <string name="hello_mad">Hello MAD</string>
     <string name="dictionary_label">Dictionary</string>
+    <string name="word_game_label">Word Game</string>
     <string name="dictionary_activity">Test Dictionary</string>
     <string name="about_label">About</string>
     <string name="clear_label">Clear</string>

@@ -12,4 +12,9 @@
     <dimen name="text_margin">10dp</dimen>
     <dimen name="dictionary_width">200dp</dimen>
     <dimen name="dictionary_text_entry_width">150dp</dimen>
+    <dimen name="scroggle_tile_size">35dp</dimen>
+    <dimen name="scroggle_tile_margin">1dp</dimen>
+    <dimen name="scroggle_tile_padding">3dp</dimen>
+    <dimen name="scroggle_board_margin">1dp</dimen>
+    <dimen name="scroggle_board_padding">4dp</dimen>
 </resources>

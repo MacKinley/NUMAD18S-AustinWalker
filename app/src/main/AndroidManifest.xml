@@ -24,6 +24,9 @@
         <activity
             android:name=".CreditsActivity"
             android:label="Acknowledgments" />
+        <activity
+            android:name=".WordGameActivity"
+            android:label="Scroggle" />
 
     </application>
 

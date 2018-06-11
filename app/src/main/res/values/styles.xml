@@ -8,4 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ScroggleTile">
+        <item name="android:layout_height">@dimen/scroggle_tile_size</item>
+        <item name="android:layout_width">@dimen/scroggle_tile_size</item>
+        <item name="android:layout_margin">@dimen/scroggle_tile_margin</item>
+        <item name="android:padding">@dimen/scroggle_tile_padding</item>
+        <item name="android:background">@drawable/scroggle_tile</item>
+        <item name="android:src">@drawable/scroggle_tile</item>
+    </style>
+
 </resources>

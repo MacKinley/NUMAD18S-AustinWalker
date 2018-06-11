@@ -29,6 +29,16 @@ public class MainFragment extends Fragment {
             }
         });
 
+        // Word game listener
+        View wordGameButton = rootView.findViewById(R.id.word_game_button);
+        wordGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), WordGameActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
+
         // About button listener
         View aboutButton = rootView.findViewById(R.id.about_button);
         aboutButton.setOnClickListener(new View.OnClickListener() {

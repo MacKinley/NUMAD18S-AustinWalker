@@ -38,16 +38,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/imei_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/imei_text"
-            tools:layout_editor_absoluteX="364dp"
-            tools:layout_editor_absoluteY="172dp" />
-
-        <TextView
             android:id="@+id/about_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,6 +47,17 @@
             android:text="@string/about_text"
             tools:layout_editor_absoluteX="332dp"
             tools:layout_editor_absoluteY="56dp" />
+
+        <TextView
+            android:id="@+id/imei_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/imei_text"
+            tools:layout_editor_absoluteX="364dp"
+            tools:layout_editor_absoluteY="172dp" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

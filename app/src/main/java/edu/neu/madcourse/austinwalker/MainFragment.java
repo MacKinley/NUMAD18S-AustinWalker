@@ -34,7 +34,7 @@ public class MainFragment extends Fragment {
         wordGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), WordGameActivity.class);
+                Intent intent = new Intent(getActivity(), WordGameMenuActivity.class);
                 getActivity().startActivity(intent);
             }
         });

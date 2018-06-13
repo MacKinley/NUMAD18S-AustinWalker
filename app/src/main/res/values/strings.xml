@@ -13,4 +13,7 @@
     <string name="crash_label">Crash App</string>
     <string name="ack_text_v3"><b>Dictionary Assignment</b>\n\n<b>Stack Overflow:</b>\n<a href='https://stackoverflow.com/questions/12154940/how-to-make-a-beep-in-android'>How to generate a beep</a>\n<a href='https://stackoverflow.com/questions/6356170/how-should-i-open-and-close-my-database-properly'>Database management</a>\n\n<b>Libraries:</b>\n<a href='https://github.com/jgilfelt/android-sqlite-asset-helper'>AndroidSQLiteAssetHelper</a>\n\n<b>Style</b>\nTheme and button design adapted from Hello, Android TicTacToe example</string>
     <string name="ack_text_v5"><b>Word Game Assignment</b>\n\n<b>Stack Overflow:</b></string>
+    <string name="scroggle_title">Scroggle</string>
+    <string name="scroggle_new_game_label">New Game</string>
+    <string name="scroggle_resume_game_label">Resume Game</string>
 </resources>

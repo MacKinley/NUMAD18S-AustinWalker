@@ -7,7 +7,7 @@
     tools:layout_editor_absoluteY="81dp">
 
     <Button
-        android:id="@+id/ack_button"
+        android:id="@+id/dictionary_ack_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
@@ -71,7 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="top"
-        app:constraint_referenced_ids="ack_button"
+        app:constraint_referenced_ids="dictionary_ack_button"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 

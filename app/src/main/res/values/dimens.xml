@@ -15,7 +15,6 @@
     <dimen name="scroggle_tile_size">35dp</dimen>
     <dimen name="scroggle_tile_margin">1dp</dimen>
     <dimen name="scroggle_tile_padding">3dp</dimen>
-    <dimen name="scroggle_board_margin">1dp</dimen>
     <dimen name="scroggle_board_padding">4dp</dimen>
     <dimen name="act_text_view_padding">15dp</dimen>
 </resources>

@@ -27,7 +27,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="50dp"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:gravity="center_horizontal|center"
         android:paddingTop="@dimen/text_margin"
         android:text="@string/about_text"

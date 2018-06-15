@@ -1,13 +1,18 @@
 package edu.neu.madcourse.austinwalker;
 
 import android.app.Fragment;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 public class WordGameFragment extends Fragment {
+
+    final static String TAG = "WordGameFragment";
 
     static private int mLargeIds[] = {R.id.largeTile1, R.id.largeTile2, R.id.largeTile3, R.id.largeTile4, R.id.largeTile5, R.id.largeTile6, R.id.largeTile7, R.id.largeTile8, R.id.largeTile9};
     static private int mSmallIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
@@ -68,5 +73,23 @@ public class WordGameFragment extends Fragment {
                 });
             }
         }
+    }
+
+    public String[] getRandomWords() {
+        String[] randomWords = new String[9];
+
+        MyApplication myApp = (MyApplication) this.getActivity().getApplication();
+        SQLiteDatabase wordDb = myApp.dictionaryDb;
+
+        Cursor cursor = wordDb.rawQuery("SELECT word FROM words WHERE LENGTH(word) = 9 ORDER BY RANDOM() LIMIT 9 ", new String[]{});
+
+        cursor.moveToFirst();
+        for (int i = 0; i < 9; i++) {
+            randomWords[i] = cursor.getString(0);
+            Log.d(TAG, "getRandomWords: " + randomWords[i]);
+            cursor.moveToNext();
+        }
+
+        return randomWords;
     }
 }

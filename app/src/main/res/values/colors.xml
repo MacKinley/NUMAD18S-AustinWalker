@@ -7,4 +7,5 @@
     <color name="border_color">#7f7f7f</color>
     <color name="dark_border_color">#4f4f4f</color>
     <color name="gray_color">#bfbfbf</color>
+    <color name="tile_selected_color">#b00020</color>
 </resources>

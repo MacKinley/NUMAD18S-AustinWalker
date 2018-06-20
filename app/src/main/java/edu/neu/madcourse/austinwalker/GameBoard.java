@@ -90,11 +90,11 @@ public class GameBoard {
 
         int lastSelected = selectedTiles.peek();
         return (isAdjacent(lastSelected, index) && !gameTiles[index].selected())
-                || lastSelected == index;
+                || gameTiles[index].selected();
     }
 
     // Color the tile and add the letter to mCurrentWord
-    // OR uncolor the tile and take away a letter
+    // OR pop back to the current tile
     private void toggleSelected(int index) {
         Tile tile = gameTiles[index];
 
@@ -103,10 +103,23 @@ public class GameBoard {
             tile.setSelected();
             selectedTiles.push(index);
         } else {
-            int len = mCurrentWord.length();
-            mCurrentWord.deleteCharAt(len - 1);
-            tile.setUnselected();
-            selectedTiles.pop();
+            if (selectedTiles.size() == 1) {
+                selectedTiles.pop();
+                tile.setUnselected();
+                mCurrentWord.deleteCharAt(0);
+            } else {
+                int deleteLen = 0;
+
+                // Pop back to the selected
+                while (!selectedTiles.empty() && selectedTiles.peek() != index) {
+                    int lastIndex = selectedTiles.pop();
+                    gameTiles[lastIndex].setUnselected();
+                    deleteLen++;
+                }
+
+                int currentLen = mCurrentWord.length();
+                mCurrentWord.delete(currentLen - deleteLen, currentLen);
+            }
         }
 
         TextView currentWordText = (TextView) mRootView.findViewById(R.id.scroggle_display_word);
@@ -175,10 +188,6 @@ public class GameBoard {
 
     // See if the text is in our dictionary db
     private boolean checkDictionaryWord(String word) {
-        if (word.length() < 3) {
-            return false;
-        }
-
         MyApplication myApp = (MyApplication) mGame.getActivity().getApplication();
         SQLiteDatabase wordDb = myApp.dictionaryDb;
 

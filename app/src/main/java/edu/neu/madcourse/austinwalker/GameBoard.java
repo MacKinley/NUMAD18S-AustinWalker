@@ -7,15 +7,22 @@ import android.media.ToneGenerator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
 import java.util.Stack;
 
 public class GameBoard {
 
     static final String TAG = "GameBoard";
 
+    static public int lastBoardSelected = -1;
+
     static private int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
 
+    private View mRootView;
     private View mView;
+    private int mBoardId;
+    private boolean mBoardFinished = false;
     private char[] mBoardState = new char[9];
     private StringBuilder mCurrentWord = new StringBuilder(9);
     private Tile[] gameTiles = new Tile[9];
@@ -24,8 +31,9 @@ public class GameBoard {
 
     private WordGameFragment mGame;
 
-    public GameBoard(WordGameFragment game, String startingWord) {
+    public GameBoard(WordGameFragment game, int boardID, String startingWord) {
         mGame = game;
+        mBoardId = boardID;
 
         initBoardState(startingWord);
 
@@ -47,7 +55,8 @@ public class GameBoard {
         mBoardState[8] = word.charAt(8);
     }
 
-    public void setView(View view) {
+    public void setView(View rootView, View view) {
+        mRootView = rootView;
         mView = view;
 
         for (int i = 0; i < 9; i++) {
@@ -62,6 +71,7 @@ public class GameBoard {
                 public void onClick(View v) {
                     if (canSelectOrUnselect(tileIndex)) {
                         toggleSelected(tileIndex);
+                        lastBoardSelected = mBoardId;
                     }
                 }
             });
@@ -73,7 +83,10 @@ public class GameBoard {
     // 2. is adjacent to selected and is NOT selected
     // 3. was most recently selected
     private boolean canSelectOrUnselect(int index) {
-        if (selectedTiles.empty()) return true;
+        if (mBoardFinished)
+            return false;
+        if (selectedTiles.empty())
+            return true;
 
         int lastSelected = selectedTiles.peek();
         return (isAdjacent(lastSelected, index) && !gameTiles[index].selected())
@@ -91,15 +104,36 @@ public class GameBoard {
             selectedTiles.push(index);
         } else {
             int len = mCurrentWord.length();
-            mCurrentWord.deleteCharAt(len-1);
+            mCurrentWord.deleteCharAt(len - 1);
             tile.setUnselected();
             selectedTiles.pop();
         }
 
+        TextView currentWordText = (TextView) mRootView.findViewById(R.id.scroggle_display_word);
+        currentWordText.setText(mCurrentWord.toString());
         Log.d(TAG, "Current word: " + mCurrentWord.toString());
+    }
+
+    public String getCurrentWord() {
+        return mCurrentWord.toString();
+    }
+
+    // returns true if final selection is a word
+    public boolean finishWord() {
         if (checkDictionaryWord(mCurrentWord.toString())) {
             beep();
+
+            while (!selectedTiles.empty()) {
+                int tileId = selectedTiles.pop();
+                gameTiles[tileId].setFinished();
+            }
+            mBoardFinished = true;
+            return true;
         }
+
+        mBoardFinished = true;
+
+        return false;
     }
 
     // Simple check for tiles that are touching each other

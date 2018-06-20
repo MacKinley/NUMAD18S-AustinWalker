@@ -8,4 +8,5 @@
     <color name="dark_border_color">#4f4f4f</color>
     <color name="gray_color">#bfbfbf</color>
     <color name="tile_selected_color">#b00020</color>
+    <color name="finished_color">#03dac6</color>
 </resources>

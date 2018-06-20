@@ -32,4 +32,8 @@ public class Tile {
         mView.setBackgroundColor(mGame.getResources().getColor(R.color.gray_color));
     }
 
+    public void setFinished() {
+        mView.setBackgroundColor(mGame.getResources().getColor(R.color.finished_color));
+    }
+
 }

@@ -1,12 +1,36 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fragment_word_game"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/scroggle_display_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CurrentWord"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/scroggle_finish_word_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scroggle_finish_word_label" />
+    </LinearLayout>
 
     <include
         layout="@layout/large_board"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-</RelativeLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="TIMER"/>
+
+</LinearLayout>

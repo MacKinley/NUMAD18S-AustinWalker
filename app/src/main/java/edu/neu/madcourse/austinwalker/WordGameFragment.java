@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 public class WordGameFragment extends Fragment {
 
@@ -37,15 +38,24 @@ public class WordGameFragment extends Fragment {
 
         // Set up the tiles
         for (int i = 0; i < 9; i++) {
-            mGameBoards[i] = new GameBoard(this, words[i]);
+            mGameBoards[i] = new GameBoard(this, i, words[i]);
         }
     }
 
     private void initViews(View rootView) {
         for (int i = 0; i < 9; i++) {
             View outer = rootView.findViewById(mLargeIds[i]);
-            mGameBoards[i].setView(outer);
+            mGameBoards[i].setView(rootView, outer);
         }
+
+        Button finishButton = (Button) rootView.findViewById(R.id.scroggle_finish_word_button);
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int selectedBoard = GameBoard.lastBoardSelected;
+                mGameBoards[selectedBoard].finishWord();
+            }
+        });
     }
 
     public String[] getRandomWords() {

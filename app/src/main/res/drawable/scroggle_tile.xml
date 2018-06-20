@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <stroke
-        android:width="@dimen/stroke_width"
-        android:color="@color/dark_border_color"/>
-    <solid android:color="@color/gray_color"/>
-    <corners android:radius="@dimen/corner_radius"/>
-</shape>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/scroggle_tile_unselected"
+        android:maxLevel="0" />
+
+    <item
+        android:drawable="@drawable/scroggle_tile_selected"
+        android:maxLevel="1" />
+
+    <item
+        android:drawable="@drawable/scroggle_tile_incomplete"
+        android:maxLevel="2" />
+
+    <item
+        android:drawable="@drawable/scroggle_tile_complete"
+        android:maxLevel="3" />
+</level-list>

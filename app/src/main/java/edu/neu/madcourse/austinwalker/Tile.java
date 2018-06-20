@@ -24,16 +24,20 @@ public class Tile {
 
     public void setSelected() {
         mSelected = true;
-        mView.setBackgroundColor(mGame.getResources().getColor(R.color.tile_selected_color));
+        mView.getBackground().setLevel(1);
     }
 
     public void setUnselected() {
         mSelected = false;
-        mView.setBackgroundColor(mGame.getResources().getColor(R.color.gray_color));
+        mView.getBackground().setLevel(0);
     }
 
-    public void setFinished() {
-        mView.setBackgroundColor(mGame.getResources().getColor(R.color.finished_color));
+    public void setIncomplete() {
+        mView.getBackground().setLevel(2);
+    }
+
+    public void setComplete() {
+        mView.getBackground().setLevel(3);
     }
 
 }

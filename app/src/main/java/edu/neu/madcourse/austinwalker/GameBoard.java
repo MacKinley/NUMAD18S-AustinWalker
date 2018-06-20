@@ -119,21 +119,23 @@ public class GameBoard {
     }
 
     // returns true if final selection is a word
-    public boolean finishWord() {
+    // TODO: bail if less thann 3 letters
+    public void finishWord() {
         if (checkDictionaryWord(mCurrentWord.toString())) {
             beep();
 
             while (!selectedTiles.empty()) {
                 int tileId = selectedTiles.pop();
-                gameTiles[tileId].setFinished();
+                gameTiles[tileId].setComplete();
             }
-            mBoardFinished = true;
-            return true;
+        } else {
+            while (!selectedTiles.empty()) {
+                int tileId = selectedTiles.pop();
+                gameTiles[tileId].setIncomplete();
+            }
         }
 
         mBoardFinished = true;
-
-        return false;
     }
 
     // Simple check for tiles that are touching each other

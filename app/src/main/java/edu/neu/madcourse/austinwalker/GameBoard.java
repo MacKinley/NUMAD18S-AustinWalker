@@ -7,8 +7,6 @@ import android.media.ToneGenerator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import java.util.ArrayList;
 import java.util.Stack;
 
 public class GameBoard {
@@ -18,7 +16,7 @@ public class GameBoard {
     static private int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
 
     private View mView;
-    private char[] mBoardWord;
+    private char[] mBoardState = new char[9];
     private StringBuilder mCurrentWord = new StringBuilder(9);
     private Tile[] gameTiles = new Tile[9];
 
@@ -28,11 +26,25 @@ public class GameBoard {
 
     public GameBoard(WordGameFragment game, String startingWord) {
         mGame = game;
-        mBoardWord = startingWord.toCharArray();
+
+        initBoardState(startingWord);
 
         for (int i = 0; i < 9; i++) {
             gameTiles[i] = new Tile(game);
         }
+    }
+
+    // TODO: make this better
+    private void initBoardState(String word) {
+        mBoardState[0] = word.charAt(0);
+        mBoardState[1] = word.charAt(1);
+        mBoardState[2] = word.charAt(2);
+        mBoardState[3] = word.charAt(5);
+        mBoardState[4] = word.charAt(4);
+        mBoardState[5] = word.charAt(3);
+        mBoardState[6] = word.charAt(6);
+        mBoardState[7] = word.charAt(7);
+        mBoardState[8] = word.charAt(8);
     }
 
     public void setView(View view) {
@@ -42,7 +54,7 @@ public class GameBoard {
             final Button inner = (Button) mView.findViewById(tileIds[i]);
             gameTiles[i].setView(inner);
 
-            inner.setText(mBoardWord, i, 1);
+            inner.setText(mBoardState, i, 1);
 
             final int tileIndex = i;
             inner.setOnClickListener(new View.OnClickListener() {
@@ -74,7 +86,7 @@ public class GameBoard {
         Tile tile = gameTiles[index];
 
         if (!tile.selected()) {
-            mCurrentWord.append(mBoardWord[index]);
+            mCurrentWord.append(mBoardState[index]);
             tile.setSelected();
             selectedTiles.push(index);
         } else {
@@ -147,7 +159,7 @@ public class GameBoard {
             ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
             beep.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 300);
         } catch (RuntimeException e) {
-//            Log.d(TAG, "Can't generate tone!");
+            Log.d(TAG, "Can't generate tone!");
         }
     }
 }

@@ -7,8 +7,8 @@
     <fragment
         android:id="@+id/fragment_word_game"
         class="edu.neu.madcourse.austinwalker.WordGameFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:layout="@layout/fragment_word_game" />
 
 

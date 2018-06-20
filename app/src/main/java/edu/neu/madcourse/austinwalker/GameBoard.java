@@ -110,7 +110,7 @@ public class GameBoard {
         }
 
         TextView currentWordText = (TextView) mRootView.findViewById(R.id.scroggle_display_word);
-        currentWordText.setText(mCurrentWord.toString());
+        currentWordText.setText(mCurrentWord.toString().toUpperCase());
         Log.d(TAG, "Current word: " + mCurrentWord.toString());
     }
 

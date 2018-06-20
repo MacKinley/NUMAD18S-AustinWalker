@@ -28,7 +28,9 @@
             android:name=".WordGameMenuActivity"
             android:label="Scroggle" />
         <activity android:name=".WordGameActivity"
-            android:label="Scroggle" />
+            android:label="Scroggle"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"/>
 
     </application>
 

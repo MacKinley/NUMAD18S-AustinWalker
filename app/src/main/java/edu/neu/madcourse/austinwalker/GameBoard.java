@@ -19,7 +19,7 @@ public class GameBoard {
 
     static private int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
 
-    private View mRootView;
+    private View mRootView; // Hacky, but I need to update the word display
     private View mView;
     private int mBoardId;
     private boolean mBoardFinished = false;
@@ -71,7 +71,7 @@ public class GameBoard {
                 @Override
                 public void onClick(View v) {
                     if (canSelectOrUnselect(tileIndex)) {
-                        toggleSelected(tileIndex);
+                        updateSelection(tileIndex);
                         lastBoardSelected = mBoardId;
                     }
                 }
@@ -81,8 +81,8 @@ public class GameBoard {
 
     // Returns true if tile is:
     // 1. first to be selected
-    // 2. is adjacent to selected and is NOT selected
-    // 3. was most recently selected
+    // 2. is adjacent to last selected and is NOT selected
+    // 3. is already in the word
     private boolean canSelectOrUnselect(int index) {
         if (mBoardFinished)
             return false;
@@ -94,9 +94,9 @@ public class GameBoard {
                 || gameTiles[index].selected();
     }
 
-    // Color the tile and add the letter to mCurrentWord
+    // Add the letter to mCurrentWord
     // OR pop back to the current tile
-    private void toggleSelected(int index) {
+    private void updateSelection(int index) {
         Tile tile = gameTiles[index];
 
         if (!tile.selected()) {
@@ -104,7 +104,8 @@ public class GameBoard {
             tile.setSelected();
             selectedTiles.push(index);
         } else {
-            if (selectedTiles.size() == 1 || selectedTiles.peek() == index) {
+            // Unselect the last tile
+            if (selectedTiles.peek() == index) {
                 selectedTiles.pop();
                 tile.setUnselected();
                 mCurrentWord.deleteCharAt(mCurrentWord.length() - 1);

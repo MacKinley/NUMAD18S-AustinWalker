@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class WordGameFragment extends Fragment {
 
@@ -17,6 +18,9 @@ public class WordGameFragment extends Fragment {
     static private int mLargeIds[] = {R.id.largeTile1, R.id.largeTile2, R.id.largeTile3, R.id.largeTile4, R.id.largeTile5, R.id.largeTile6, R.id.largeTile7, R.id.largeTile8, R.id.largeTile9};
 
     private GameBoard mGameBoards[] = new GameBoard[9];
+    private int gameMode = 1;
+    private int mWordsLeft = 9;
+    private int mScore = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +46,7 @@ public class WordGameFragment extends Fragment {
         }
     }
 
-    private void initViews(View rootView) {
+    private void initViews(final View rootView) {
         for (int i = 0; i < 9; i++) {
             View outer = rootView.findViewById(mLargeIds[i]);
             mGameBoards[i].setView(rootView, outer);
@@ -53,12 +57,23 @@ public class WordGameFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 int selectedBoard = GameBoard.lastBoardSelected;
-                mGameBoards[selectedBoard].finishWord();
+                if (mGameBoards[selectedBoard].finishWord()) {
+                    mWordsLeft--;
+
+                    TextView wordsLeftView = (TextView) rootView.findViewById(R.id.scroggle_display_word);
+                    wordsLeftView.setText("Find " + mWordsLeft + " words");
+
+                    // TODO extract this
+                    mScore += mGameBoards[selectedBoard].getBoardScore();
+                    TextView scoreView = (TextView) rootView.findViewById(R.id.scroggle_display_score);
+                    String scoreLabel = getResources().getString(R.string.scroggle_score_label);
+                    scoreView.setText(scoreLabel + " " + mScore);
+                }
             }
         });
     }
 
-    public String[] getRandomWords() {
+    private String[] getRandomWords() {
         String[] randomWords = new String[9];
 
         MyApplication myApp = (MyApplication) this.getActivity().getApplication();
@@ -75,6 +90,4 @@ public class WordGameFragment extends Fragment {
 
         return randomWords;
     }
-
-
 }

@@ -32,11 +32,11 @@ public class Tile {
         mView.getBackground().setLevel(0);
     }
 
-    public void setIncomplete() {
+    public void setInvalid() {
         mView.getBackground().setLevel(2);
     }
 
-    public void setComplete() {
+    public void setValid() {
         mView.getBackground().setLevel(3);
     }
 

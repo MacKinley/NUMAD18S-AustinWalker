@@ -23,6 +23,7 @@ public class GameBoard {
     private View mView;
     private int mBoardId;
     private boolean mBoardFinished = false;
+    private boolean mBoardValid = false;
     private char[] mBoardState = new char[9];
     private StringBuilder mCurrentWord = new StringBuilder(9);
     private Tile[] gameTiles = new Tile[9];
@@ -103,10 +104,10 @@ public class GameBoard {
             tile.setSelected();
             selectedTiles.push(index);
         } else {
-            if (selectedTiles.size() == 1) {
+            if (selectedTiles.size() == 1 || selectedTiles.peek() == index) {
                 selectedTiles.pop();
                 tile.setUnselected();
-                mCurrentWord.deleteCharAt(0);
+                mCurrentWord.deleteCharAt(mCurrentWord.length() - 1);
             } else {
                 int deleteLen = 0;
 
@@ -127,28 +128,30 @@ public class GameBoard {
         Log.d(TAG, "Current word: " + mCurrentWord.toString());
     }
 
-    public String getCurrentWord() {
-        return mCurrentWord.toString();
+    // Return a negative score if this wasn't a valid word
+    public int getBoardScore() {
+        if (mBoardValid) {
+            return mCurrentWord.length();
+        } else {
+            return 0 - mCurrentWord.length();
+        }
     }
 
     // returns true if final selection is a word
-    // TODO: bail if less thann 3 letters
-    public void finishWord() {
+    public boolean finishWord() {
+        if (mBoardFinished || mCurrentWord.length() < 3) {
+            return false;
+        }
+
         if (checkDictionaryWord(mCurrentWord.toString())) {
             beep();
-
-            while (!selectedTiles.empty()) {
-                int tileId = selectedTiles.pop();
-                gameTiles[tileId].setComplete();
-            }
+            finishTiles(true);
         } else {
-            while (!selectedTiles.empty()) {
-                int tileId = selectedTiles.pop();
-                gameTiles[tileId].setIncomplete();
-            }
+            finishTiles(false);
         }
 
         mBoardFinished = true;
+        return true;
     }
 
     // Simple check for tiles that are touching each other
@@ -183,6 +186,22 @@ public class GameBoard {
 
             default:
                 return false;
+        }
+    }
+
+    // Color the current word green or red
+    private void finishTiles(boolean valid) {
+        mBoardValid = valid;
+        Stack<Integer> tilesCopy = selectedTiles;
+
+        while (!tilesCopy.empty()) {
+            int tileId = tilesCopy.pop();
+
+            if (valid) {
+                gameTiles[tileId].setValid();
+            } else {
+                gameTiles[tileId].setInvalid();
+            }
         }
     }
 

@@ -66,8 +66,8 @@ public class WordGameFragment extends Fragment {
                     // TODO extract this
                     mScore += mGameBoards[selectedBoard].getBoardScore();
                     TextView scoreView = (TextView) rootView.findViewById(R.id.scroggle_display_score);
-                    String scoreLabel = getResources().getString(R.string.scroggle_score_label);
-                    scoreView.setText(scoreLabel + " " + mScore);
+                    String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
+                    scoreView.setText(scoreLabel);
                 }
             }
         });

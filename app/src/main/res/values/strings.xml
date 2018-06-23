@@ -17,5 +17,5 @@
     <string name="scroggle_new_game_label">New Game</string>
     <string name="scroggle_resume_game_label">Resume Game</string>
     <string name="scroggle_finish_word_label">Select</string>
-    <string name="scroggle_score_label">Score: </string>
+    <string name="scroggle_score_label">Score: %1$d</string>
 </resources>

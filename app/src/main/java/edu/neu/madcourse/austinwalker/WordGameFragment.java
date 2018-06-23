@@ -19,7 +19,10 @@ public class WordGameFragment extends Fragment {
 
     private enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO}
 
-    ;
+    private View mRootView;
+    private TextView mDisplayTextView;
+    private TextView mScoreTextView;
+    private Button mMakeMoveButton;
 
     private GameBoard mGameBoards[] = new GameBoard[9];
     private GAME_STATE gameState = GAME_STATE.ROUND_ONE;
@@ -51,54 +54,68 @@ public class WordGameFragment extends Fragment {
     }
 
     private void initViews(final View rootView) {
+        mRootView = rootView;
+
+        mDisplayTextView = (TextView) mRootView.findViewById(R.id.scroggle_display_word);
+        mScoreTextView = (TextView) mRootView.findViewById(R.id.scroggle_display_score);
+        mMakeMoveButton = (Button) rootView.findViewById(R.id.scroggle_finish_word_button);
+
         for (int i = 0; i < 9; i++) {
             View outer = rootView.findViewById(mLargeIds[i]);
             mGameBoards[i].setView(rootView, outer);
         }
 
-        final TextView wordsLeftView = (TextView) rootView.findViewById(R.id.scroggle_display_word);
-
-        final Button finishButton = (Button) rootView.findViewById(R.id.scroggle_finish_word_button);
-        finishButton.setOnClickListener(new View.OnClickListener() {
+        mMakeMoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            // TODO CLEAN ME PLEEASE
             public void onClick(View v) {
                 if (gameState == GAME_STATE.ROUND_ONE) {
-                    int selectedBoard = GameBoard.lastBoardSelected;
-                    if (mGameBoards[selectedBoard].finishWord()) {
-                        mWordsLeft--;
-
-
-                        wordsLeftView.setText("Find " + mWordsLeft + " words");
-
-                        // TODO extract this
-                        mScore += mGameBoards[selectedBoard].getBoardScore();
-                        TextView scoreView = (TextView) rootView.findViewById(R.id.scroggle_display_score);
-                        String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
-                        scoreView.setText(scoreLabel);
-
-                        if (mWordsLeft == 0) {
-                            wordsLeftView.setText("Round 2!");
-                            finishButton.setText("Go");
-                            gameState = GAME_STATE.CHANGE_ROUND;
-                        }
-                    }
-                } else if (gameState == GAME_STATE.CHANGE_ROUND){
-                    // pop instruction toast
-
-                    for (int i = 0; i < 9; i++) {
-                        mGameBoards[i].startRoundTwo();
-                    }
-
-                    finishButton.setText("Select");
-                    wordsLeftView.setText("Spell a word");
-                    gameState = GAME_STATE.ROUND_TWO;
+                    doRoundOneTurn();
+                } else if (gameState == GAME_STATE.CHANGE_ROUND) {
+                    changeRound();
                 } else {
-                    // play round 2
+                    doRoundTwoTurn();
                 }
             }
         });
     }
+
+    private void doRoundOneTurn() {
+        int selectedBoard = GameBoard.lastBoardSelected;
+        if (mGameBoards[selectedBoard].finishWord()) {
+            mWordsLeft--;
+
+            mDisplayTextView.setText("Find " + mWordsLeft + " words");
+
+            mScore += mGameBoards[selectedBoard].getBoardScore();
+
+            String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
+            mScoreTextView.setText(scoreLabel);
+
+            // Time to do round 2
+            if (mWordsLeft == 0) {
+                mDisplayTextView.setText("Round 2!");
+                mMakeMoveButton.setText("Go");
+                gameState = GAME_STATE.CHANGE_ROUND;
+            }
+        }
+    }
+
+    private void changeRound() {
+        // pop instruction toast
+
+        for (int i = 0; i < 9; i++) {
+            mGameBoards[i].startRoundTwo();
+        }
+
+        mMakeMoveButton.setText("Select");
+        mDisplayTextView.setText("Spell a word");
+        gameState = GAME_STATE.ROUND_TWO;
+    }
+
+    private void doRoundTwoTurn() {
+
+    }
+
 
     private String[] getRandomWords() {
         String[] randomWords = new String[9];

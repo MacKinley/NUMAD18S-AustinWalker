@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Random;
 import java.util.Stack;
 
 public class GameBoard {
@@ -209,6 +210,24 @@ public class GameBoard {
         }
     }
 
+    public void startRoundTwo() {
+
+        for (int i = 0; i < 9; i++) {
+            Tile tile = gameTiles[i];
+
+            tile.setUnselected();
+
+            if (!mBoardValid || !tile.isValid()) {
+                tile.removeLetter();
+            }
+        }
+
+        // If we removed everything, place a random letter
+        if (!mBoardValid) {
+            gameTiles[4].setLetter(getRandomLetter());
+        }
+    }
+
     // See if the text is in our dictionary db
     private boolean checkDictionaryWord(String word) {
         MyApplication myApp = (MyApplication) mGame.getActivity().getApplication();
@@ -229,5 +248,11 @@ public class GameBoard {
         } catch (RuntimeException e) {
             Log.d(TAG, "Can't generate tone!");
         }
+    }
+
+    private char getRandomLetter() {
+        Random r = new Random();
+
+        return (char) (r.nextInt(26) + 'a');
     }
 }

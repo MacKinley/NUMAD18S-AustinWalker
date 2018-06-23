@@ -6,6 +6,7 @@ import android.widget.Button;
 public class Tile {
 
     private boolean mSelected;
+    private boolean mValid;
     private char mLetter;
     private View mView;
 
@@ -13,25 +14,26 @@ public class Tile {
 
     public Tile(WordGameFragment game, char letter) {
         mGame = game;
-        mLetter = letter;
         mSelected = false;
+        mValid = false;
+        mLetter = letter;
     }
 
     public void setView(View view) {
         mView = view;
-
-        Button tile = (Button) mView;
-        tile.setText(new char[]{mLetter}, 0, 1);
+        setLetter(mLetter);
     }
 
     public void setLetter(char letter) {
         mLetter = letter;
         Button tile = (Button) mView;
         tile.setText(new char[]{mLetter}, 0, 1);
+        tile.getBackground().setLevel(1);
     }
 
     public void removeLetter() {
         setLetter(' ');
+        mView.getBackground().setLevel(0);
     }
 
     public char getLetter() {
@@ -48,20 +50,26 @@ public class Tile {
 
     public void setSelected() {
         mSelected = true;
-        mView.getBackground().setLevel(1);
+        mView.getBackground().setLevel(2);
     }
 
     public void setUnselected() {
         mSelected = false;
-        mView.getBackground().setLevel(0);
+        mView.getBackground().setLevel(1);
     }
 
     public void setInvalid() {
-        mView.getBackground().setLevel(2);
+        mValid = false;
+        mView.getBackground().setLevel(3);
     }
 
     public void setValid() {
-        mView.getBackground().setLevel(3);
+        mValid = true;
+        mView.getBackground().setLevel(4);
+    }
+
+    public boolean isValid() {
+        return mValid;
     }
 
 }

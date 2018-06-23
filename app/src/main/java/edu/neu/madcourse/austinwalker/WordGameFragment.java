@@ -17,8 +17,12 @@ public class WordGameFragment extends Fragment {
 
     static private int mLargeIds[] = {R.id.largeTile1, R.id.largeTile2, R.id.largeTile3, R.id.largeTile4, R.id.largeTile5, R.id.largeTile6, R.id.largeTile7, R.id.largeTile8, R.id.largeTile9};
 
+    private enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO}
+
+    ;
+
     private GameBoard mGameBoards[] = new GameBoard[9];
-    private int gameMode = 1;
+    private GAME_STATE gameState = GAME_STATE.ROUND_ONE;
     private int mWordsLeft = 9;
     private int mScore = 0;
 
@@ -52,22 +56,45 @@ public class WordGameFragment extends Fragment {
             mGameBoards[i].setView(rootView, outer);
         }
 
-        Button finishButton = (Button) rootView.findViewById(R.id.scroggle_finish_word_button);
+        final TextView wordsLeftView = (TextView) rootView.findViewById(R.id.scroggle_display_word);
+
+        final Button finishButton = (Button) rootView.findViewById(R.id.scroggle_finish_word_button);
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
+            // TODO CLEAN ME PLEEASE
             public void onClick(View v) {
-                int selectedBoard = GameBoard.lastBoardSelected;
-                if (mGameBoards[selectedBoard].finishWord()) {
-                    mWordsLeft--;
+                if (gameState == GAME_STATE.ROUND_ONE) {
+                    int selectedBoard = GameBoard.lastBoardSelected;
+                    if (mGameBoards[selectedBoard].finishWord()) {
+                        mWordsLeft--;
 
-                    TextView wordsLeftView = (TextView) rootView.findViewById(R.id.scroggle_display_word);
-                    wordsLeftView.setText("Find " + mWordsLeft + " words");
 
-                    // TODO extract this
-                    mScore += mGameBoards[selectedBoard].getBoardScore();
-                    TextView scoreView = (TextView) rootView.findViewById(R.id.scroggle_display_score);
-                    String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
-                    scoreView.setText(scoreLabel);
+                        wordsLeftView.setText("Find " + mWordsLeft + " words");
+
+                        // TODO extract this
+                        mScore += mGameBoards[selectedBoard].getBoardScore();
+                        TextView scoreView = (TextView) rootView.findViewById(R.id.scroggle_display_score);
+                        String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
+                        scoreView.setText(scoreLabel);
+
+                        if (mWordsLeft == 0) {
+                            wordsLeftView.setText("Round 2!");
+                            finishButton.setText("Go");
+                            gameState = GAME_STATE.CHANGE_ROUND;
+                        }
+                    }
+                } else if (gameState == GAME_STATE.CHANGE_ROUND){
+                    // pop instruction toast
+
+                    for (int i = 0; i < 9; i++) {
+                        mGameBoards[i].startRoundTwo();
+                    }
+
+                    finishButton.setText("Select");
+                    wordsLeftView.setText("Spell a word");
+                    gameState = GAME_STATE.ROUND_TWO;
+                } else {
+                    // play round 2
                 }
             }
         });

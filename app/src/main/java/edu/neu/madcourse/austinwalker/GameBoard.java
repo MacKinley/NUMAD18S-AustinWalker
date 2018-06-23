@@ -24,7 +24,6 @@ public class GameBoard {
     private int mBoardId;
     private boolean mBoardFinished = false;
     private boolean mBoardValid = false;
-    private char[] mBoardState = new char[9];
     private StringBuilder mCurrentWord = new StringBuilder(9);
     private Tile[] gameTiles = new Tile[9];
 
@@ -36,24 +35,27 @@ public class GameBoard {
         mGame = game;
         mBoardId = boardID;
 
-        initBoardState(startingWord);
+        char[] startState = shuffleWord(startingWord);
 
         for (int i = 0; i < 9; i++) {
-            gameTiles[i] = new Tile(game);
+            gameTiles[i] = new Tile(game, startState[i]);
         }
     }
 
     // TODO: make this better
-    private void initBoardState(String word) {
-        mBoardState[0] = word.charAt(0);
-        mBoardState[1] = word.charAt(1);
-        mBoardState[2] = word.charAt(2);
-        mBoardState[3] = word.charAt(5);
-        mBoardState[4] = word.charAt(4);
-        mBoardState[5] = word.charAt(3);
-        mBoardState[6] = word.charAt(6);
-        mBoardState[7] = word.charAt(7);
-        mBoardState[8] = word.charAt(8);
+    private char[] shuffleWord(String word) {
+        char[] boardState = new char[9];
+        boardState[0] = word.charAt(0);
+        boardState[1] = word.charAt(1);
+        boardState[2] = word.charAt(2);
+        boardState[3] = word.charAt(5);
+        boardState[4] = word.charAt(4);
+        boardState[5] = word.charAt(3);
+        boardState[6] = word.charAt(6);
+        boardState[7] = word.charAt(7);
+        boardState[8] = word.charAt(8);
+
+        return boardState;
     }
 
     public void setView(View rootView, View view) {
@@ -63,8 +65,6 @@ public class GameBoard {
         for (int i = 0; i < 9; i++) {
             final Button inner = (Button) mView.findViewById(tileIds[i]);
             gameTiles[i].setView(inner);
-
-            inner.setText(mBoardState, i, 1);
 
             final int tileIndex = i;
             inner.setOnClickListener(new View.OnClickListener() {
@@ -84,14 +84,16 @@ public class GameBoard {
     // 2. is adjacent to last selected and is NOT selected
     // 3. is already in the word
     private boolean canSelectOrUnselect(int index) {
-        if (mBoardFinished)
+        Tile tile = gameTiles[index];
+
+        if (mBoardFinished || !tile.hasLetter())
             return false;
         if (selectedTiles.empty())
             return true;
 
         int lastSelected = selectedTiles.peek();
-        return (isAdjacent(lastSelected, index) && !gameTiles[index].selected())
-                || gameTiles[index].selected();
+        return (isAdjacent(lastSelected, index) && !tile.selected())
+                || tile.selected();
     }
 
     // Add the letter to mCurrentWord
@@ -99,8 +101,9 @@ public class GameBoard {
     private void updateSelection(int index) {
         Tile tile = gameTiles[index];
 
+
         if (!tile.selected()) {
-            mCurrentWord.append(mBoardState[index]);
+            mCurrentWord.append(tile.getLetter());
             tile.setSelected();
             selectedTiles.push(index);
         } else {

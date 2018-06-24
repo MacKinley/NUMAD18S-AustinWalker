@@ -16,21 +16,27 @@ public class GameBoard {
 
     static final String TAG = "GameBoard";
 
-    static public int lastBoardSelected = -1;
-
     static private int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
+    private static WordGameFragment mGame;
 
     private View mRootView; // Hacky, but I need to update the word display
     private View mView;
     private int mBoardId;
+
+    private Tile[] mGameTiles = new Tile[9];
+
+    // Round 1 fields
+    public static int lastBoardSelected = -1;
+
+    private Stack<Tile> mSelectedTiles = new Stack<>();
+    private StringBuilder mCurrentWord = new StringBuilder(9);
     private boolean mBoardFinished = false;
     private boolean mBoardValid = false;
-    private StringBuilder mCurrentWord = new StringBuilder(9);
-    private Tile[] gameTiles = new Tile[9];
 
-    private Stack<Integer> selectedTiles = new Stack<>();
+    // Round 2 fields
+    private static StringBuilder mRoundTwoWord = new StringBuilder();
+    private static Stack<Tile> mSelectedTilesRoundTwo = new Stack<>();
 
-    private WordGameFragment mGame;
 
     public GameBoard(WordGameFragment game, int boardID, String startingWord) {
         mGame = game;
@@ -39,7 +45,7 @@ public class GameBoard {
         char[] startState = shuffleWord(startingWord);
 
         for (int i = 0; i < 9; i++) {
-            gameTiles[i] = new Tile(game, startState[i]);
+            mGameTiles[i] = new Tile(game, boardID, i, startState[i]);
         }
     }
 
@@ -65,18 +71,33 @@ public class GameBoard {
 
         for (int i = 0; i < 9; i++) {
             final Button inner = (Button) mView.findViewById(tileIds[i]);
-            gameTiles[i].setView(inner);
+            mGameTiles[i].setView(inner);
 
             final int tileIndex = i;
             inner.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (canSelectOrUnselect(tileIndex)) {
-                        updateSelection(tileIndex);
-                        lastBoardSelected = mBoardId;
+                    if (WordGameFragment.CURRENT_STATE == WordGameFragment.GAME_STATE.ROUND_ONE) {
+                        doRoundOneTurn(tileIndex);
+                    } else if (WordGameFragment.CURRENT_STATE == WordGameFragment.GAME_STATE.ROUND_TWO) {
+                        doRoundTwoTurn(tileIndex);
                     }
                 }
             });
+        }
+    }
+
+    private void doRoundOneTurn(int tileIndex) {
+        if (canSelectOrUnselect(tileIndex)) {
+            updateSelection(tileIndex, mCurrentWord, mSelectedTiles);
+            lastBoardSelected = mBoardId;
+        }
+    }
+
+    private void doRoundTwoTurn(int tileIndex) {
+        if (canSelectOrUnselectRoundTwo(tileIndex)) {
+            // only one at a time
+            updateSelection(tileIndex, mRoundTwoWord, mSelectedTilesRoundTwo);
         }
     }
 
@@ -85,52 +106,68 @@ public class GameBoard {
     // 2. is adjacent to last selected and is NOT selected
     // 3. is already in the word
     private boolean canSelectOrUnselect(int index) {
-        Tile tile = gameTiles[index];
+        Tile tile = mGameTiles[index];
 
         if (mBoardFinished || !tile.hasLetter())
             return false;
-        if (selectedTiles.empty())
+        if (mSelectedTiles.empty())
             return true;
 
-        int lastSelected = selectedTiles.peek();
+        int lastSelected = mSelectedTiles.peek().getIndex();
         return (isAdjacent(lastSelected, index) && !tile.selected())
+                || tile.selected();
+    }
+
+    // Returns true if tile is:
+    // 1. first to be selected
+    // 2. is adjacent to last selected and is NOT selected
+    // 3. is already in the word
+    private boolean canSelectOrUnselectRoundTwo(int index) {
+        Tile tile = mGameTiles[index];
+
+        if (!tile.hasLetter())
+            return false;
+        if (mSelectedTilesRoundTwo.empty())
+            return true;
+
+        int lastSelectedBoard = mSelectedTilesRoundTwo.peek().getBoard();
+        return (isAdjacent(mBoardId, lastSelectedBoard) && !tile.selected())
                 || tile.selected();
     }
 
     // Add the letter to mCurrentWord
     // OR pop back to the current tile
-    private void updateSelection(int index) {
-        Tile tile = gameTiles[index];
-
+    private void updateSelection(int index, StringBuilder currentWord, Stack<Tile> letterStack) {
+        Tile tile = mGameTiles[index];
 
         if (!tile.selected()) {
-            mCurrentWord.append(tile.getLetter());
+            currentWord.append(tile.getLetter());
             tile.setSelected();
-            selectedTiles.push(index);
+            letterStack.push(tile);
         } else {
             // Unselect the last tile
-            if (selectedTiles.peek() == index) {
-                selectedTiles.pop();
+            if (!letterStack.empty() && letterStack.peek() == tile) {
+                letterStack.pop();
                 tile.setUnselected();
-                mCurrentWord.deleteCharAt(mCurrentWord.length() - 1);
+                currentWord.deleteCharAt(currentWord.length() - 1);
             } else {
                 int deleteLen = 0;
 
                 // Pop back to the selected
-                while (!selectedTiles.empty() && selectedTiles.peek() != index) {
-                    int lastIndex = selectedTiles.pop();
-                    gameTiles[lastIndex].setUnselected();
+                while (!letterStack.empty() && letterStack.peek() != tile) {
+                    Tile lastTile = letterStack.pop();
+                    lastTile.setUnselected();
                     deleteLen++;
                 }
 
-                int currentLen = mCurrentWord.length();
-                mCurrentWord.delete(currentLen - deleteLen, currentLen);
+                int currentLen = currentWord.length();
+                currentWord.delete(currentLen - deleteLen, currentLen);
             }
         }
 
         TextView currentWordText = (TextView) mRootView.findViewById(R.id.scroggle_display_word);
-        currentWordText.setText(mCurrentWord.toString().toUpperCase());
-        Log.d(TAG, "Current word: " + mCurrentWord.toString());
+        currentWordText.setText(currentWord.toString().toUpperCase());
+        Log.d(TAG, "Current word: " + currentWord.toString());
     }
 
     // Return a negative score if this wasn't a valid word
@@ -159,8 +196,37 @@ public class GameBoard {
         return true;
     }
 
+    // returns true if final selection is a word
+    public static int finishWordRoundTwo() {
+        int wordScore = 0;
+
+        if (mRoundTwoWord.length() >= 3 && checkDictionaryWord(mRoundTwoWord.toString())) {
+            beep();
+            wordScore = finishTilesRoundTwo();
+        }
+
+        return wordScore;
+    }
+
+    private static int finishTilesRoundTwo() {
+        int wordScore = 0;
+
+        while (!mSelectedTilesRoundTwo.empty()) {
+            Tile tile = mSelectedTilesRoundTwo.pop();
+            wordScore += tile.getPoints();
+            tile.removeLetter();
+        }
+
+        // Longer words are better
+        wordScore += mRoundTwoWord.length();
+
+        mRoundTwoWord.delete(0, mRoundTwoWord.length());
+
+        return wordScore;
+    }
+
     // Simple check for tiles that are touching each other
-    private boolean isAdjacent(int i, int j) {
+    public static boolean isAdjacent(int i, int j) {
         switch (i) {
             case 0:
                 return j == 1 || j == 3 || j == 4;
@@ -197,23 +263,26 @@ public class GameBoard {
     // Color the current word green or red
     private void finishTiles(boolean valid) {
         mBoardValid = valid;
-        Stack<Integer> tilesCopy = selectedTiles;
+        Stack<Tile> tilesCopy = mSelectedTiles;
 
         while (!tilesCopy.empty()) {
-            int tileId = tilesCopy.pop();
+            Tile tile = tilesCopy.pop();
 
             if (valid) {
-                gameTiles[tileId].setValid();
+                tile.setValid();
             } else {
-                gameTiles[tileId].setInvalid();
+                tile.setInvalid();
             }
         }
     }
 
+    // Unselect tiles
     public void startRoundTwo() {
+        mBoardFinished = false;
+        mRoundTwoWord.delete(0, mRoundTwoWord.length());
 
         for (int i = 0; i < 9; i++) {
-            Tile tile = gameTiles[i];
+            Tile tile = mGameTiles[i];
 
             tile.setUnselected();
 
@@ -224,12 +293,12 @@ public class GameBoard {
 
         // If we removed everything, place a random letter
         if (!mBoardValid) {
-            gameTiles[4].setLetter(getRandomLetter());
+            mGameTiles[4].setLetter(getRandomLetter());
         }
     }
 
     // See if the text is in our dictionary db
-    private boolean checkDictionaryWord(String word) {
+    private static boolean checkDictionaryWord(String word) {
         MyApplication myApp = (MyApplication) mGame.getActivity().getApplication();
         SQLiteDatabase wordDb = myApp.dictionaryDb;
 
@@ -241,7 +310,7 @@ public class GameBoard {
         return found;
     }
 
-    private void beep() {
+    private static void beep() {
         try {
             ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
             beep.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 300);
@@ -254,5 +323,19 @@ public class GameBoard {
         Random r = new Random();
 
         return (char) (r.nextInt(26) + 'a');
+    }
+
+    public void checkIfEmpty() {
+        boolean empty = true;
+
+        for (int i = 0; i < 9; i++) {
+            if (mGameTiles[i].hasLetter())
+                empty = false;
+        }
+
+        // Replace with a random letter
+        if (empty) {
+            mGameTiles[4].setLetter(getRandomLetter());
+        }
     }
 }

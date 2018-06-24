@@ -17,15 +17,16 @@ public class WordGameFragment extends Fragment {
 
     static private int mLargeIds[] = {R.id.largeTile1, R.id.largeTile2, R.id.largeTile3, R.id.largeTile4, R.id.largeTile5, R.id.largeTile6, R.id.largeTile7, R.id.largeTile8, R.id.largeTile9};
 
-    private enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO}
+    public enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO}
+
+    public static GAME_STATE CURRENT_STATE = GAME_STATE.ROUND_ONE;
 
     private View mRootView;
     private TextView mDisplayTextView;
     private TextView mScoreTextView;
     private Button mMakeMoveButton;
-
     private GameBoard mGameBoards[] = new GameBoard[9];
-    private GAME_STATE gameState = GAME_STATE.ROUND_ONE;
+
     private int mWordsLeft = 9;
     private int mScore = 0;
 
@@ -68,9 +69,9 @@ public class WordGameFragment extends Fragment {
         mMakeMoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (gameState == GAME_STATE.ROUND_ONE) {
+                if (CURRENT_STATE == GAME_STATE.ROUND_ONE) {
                     doRoundOneTurn();
-                } else if (gameState == GAME_STATE.CHANGE_ROUND) {
+                } else if (CURRENT_STATE == GAME_STATE.CHANGE_ROUND) {
                     changeRound();
                 } else {
                     doRoundTwoTurn();
@@ -87,15 +88,13 @@ public class WordGameFragment extends Fragment {
             mDisplayTextView.setText("Find " + mWordsLeft + " words");
 
             mScore += mGameBoards[selectedBoard].getBoardScore();
-
-            String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
-            mScoreTextView.setText(scoreLabel);
+            redisplayScore();
 
             // Time to do round 2
             if (mWordsLeft == 0) {
                 mDisplayTextView.setText("Round 2!");
                 mMakeMoveButton.setText("Go");
-                gameState = GAME_STATE.CHANGE_ROUND;
+                CURRENT_STATE = GAME_STATE.CHANGE_ROUND;
             }
         }
     }
@@ -109,11 +108,30 @@ public class WordGameFragment extends Fragment {
 
         mMakeMoveButton.setText("Select");
         mDisplayTextView.setText("Spell a word");
-        gameState = GAME_STATE.ROUND_TWO;
+        CURRENT_STATE = GAME_STATE.ROUND_TWO;
     }
 
     private void doRoundTwoTurn() {
+        int score = GameBoard.finishWordRoundTwo();
 
+        if (score > 0) {
+            mScore += score;
+            redisplayScore();
+
+            // I don't like this
+            for (int i = 0; i < 9; i++) {
+                mGameBoards[i].checkIfEmpty();
+            }
+
+            mDisplayTextView.setText("Spell a word");
+        }
+
+
+    }
+
+    private void redisplayScore() {
+        String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
+        mScoreTextView.setText(scoreLabel);
     }
 
 

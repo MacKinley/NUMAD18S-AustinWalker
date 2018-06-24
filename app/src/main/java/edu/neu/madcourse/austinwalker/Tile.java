@@ -10,12 +10,17 @@ public class Tile {
     private char mLetter;
     private View mView;
 
+    private int mBoardId;
+    private int mTileIndex;
+
     private WordGameFragment mGame;
 
-    public Tile(WordGameFragment game, char letter) {
+    public Tile(WordGameFragment game, int boardId, int tileIndex, char letter) {
         mGame = game;
         mSelected = false;
         mValid = false;
+        mBoardId = boardId;
+        mTileIndex = tileIndex;
         mLetter = letter;
     }
 
@@ -26,9 +31,11 @@ public class Tile {
 
     public void setLetter(char letter) {
         mLetter = letter;
+
         Button tile = (Button) mView;
         tile.setText(new char[]{mLetter}, 0, 1);
-        tile.getBackground().setLevel(1);
+
+        setUnselected();
     }
 
     public void removeLetter() {
@@ -36,8 +43,63 @@ public class Tile {
         mView.getBackground().setLevel(0);
     }
 
+    public int getIndex() {
+        return mTileIndex;
+    }
+
+    public int getBoard() {
+        return mBoardId;
+    }
+
     public char getLetter() {
         return mLetter;
+    }
+
+    public int getPoints() {
+        switch (mLetter) {
+            case 'e':
+            case 'a':
+            case 'i':
+            case 'o':
+            case 'n':
+            case 'r':
+            case 't':
+            case 'l':
+            case 's':
+            case 'u':
+                return 1;
+
+            case 'd':
+            case 'g':
+                return 2;
+
+            case 'b':
+            case 'c':
+            case 'm':
+            case 'p':
+                return 3;
+
+            case 'f':
+            case 'h':
+            case 'v':
+            case 'w':
+            case 'y':
+                return 4;
+
+            case 'k':
+                return 5;
+
+            case 'j':
+            case 'x':
+                return 8;
+
+            case 'q':
+            case 'z':
+                return 10;
+
+            default:
+                return 0;
+        }
     }
 
     public boolean hasLetter() {

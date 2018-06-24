@@ -16,7 +16,8 @@ public class GameBoard {
 
     static final String TAG = "GameBoard";
 
-    static private int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
+    private static int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
+    private static ToneGenerator successBeep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
     private static WordGameFragment mGame;
 
     private View mRootView; // Hacky, but I need to update the word display
@@ -186,7 +187,7 @@ public class GameBoard {
         }
 
         if (checkDictionaryWord(mCurrentWord.toString())) {
-            beep();
+            beepSucess();
             finishTiles(true);
         } else {
             finishTiles(false);
@@ -201,7 +202,7 @@ public class GameBoard {
         int wordScore = 0;
 
         if (mRoundTwoWord.length() >= 3 && checkDictionaryWord(mRoundTwoWord.toString())) {
-            beep();
+            beepSucess();
             wordScore = finishTilesRoundTwo();
         }
 
@@ -310,10 +311,9 @@ public class GameBoard {
         return found;
     }
 
-    private static void beep() {
+    private static void beepSucess() {
         try {
-            ToneGenerator beep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
-            beep.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 300);
+            successBeep.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 300);
         } catch (RuntimeException e) {
             Log.d(TAG, "Can't generate tone!");
         }

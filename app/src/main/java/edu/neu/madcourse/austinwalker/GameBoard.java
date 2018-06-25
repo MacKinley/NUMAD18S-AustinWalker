@@ -10,11 +10,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 public class GameBoard {
 
     static final String TAG = "GameBoard";
+
+    public static char STATE_DELIMITER = '/';
 
     private static int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
     private static ToneGenerator successBeep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
@@ -35,8 +39,8 @@ public class GameBoard {
     private boolean mBoardValid = false;
 
     // Round 2 fields
-    private static StringBuilder mRoundTwoWord = new StringBuilder();
-    private static Stack<Tile> mSelectedTilesRoundTwo = new Stack<>();
+    public static StringBuilder mRoundTwoWord = new StringBuilder();
+    public static Stack<Tile> mSelectedTilesRoundTwo = new Stack<>();
 
 
     public GameBoard(WordGameFragment game, int boardID, String startingWord) {
@@ -48,6 +52,111 @@ public class GameBoard {
         for (int i = 0; i < 9; i++) {
             mGameTiles[i] = new Tile(game, boardID, i, startState[i]);
         }
+    }
+
+    public String getGameState() {
+        StringBuilder state = new StringBuilder();
+
+        state.append(mBoardFinished ? "1" : "0");
+        state.append(STATE_DELIMITER);
+        state.append(mBoardValid ? "1" : "0");
+        state.append(STATE_DELIMITER);
+
+        for (Tile tile : mGameTiles) {
+            state.append(tile.getLetter());
+        }
+
+        state.append(STATE_DELIMITER);
+
+        // Reverse the selected tiles stack
+        Stack<Tile> copyStack = (Stack<Tile>) mSelectedTiles.clone();
+        Stack<Tile> reverseStack = new Stack<>();
+
+        while (!copyStack.empty()) {
+            reverseStack.push(copyStack.pop());
+        }
+
+        while (!reverseStack.empty()) {
+            Tile tile = reverseStack.pop();
+            state.append(Integer.toString(tile.getIndex()));
+            state.append(STATE_DELIMITER);
+        }
+
+        return state.toString();
+    }
+
+    // Append the static selectedWords stack
+    // UGGGGLLLLYYYY
+    public static String getRoundTwoState() {
+        StringBuilder state = new StringBuilder();
+
+        // Reverse the selected tiles stack
+        Stack<Tile> copyStack = (Stack<Tile>) mSelectedTilesRoundTwo.clone();
+        Stack<Tile> reverseStack = new Stack<>();
+
+        while (!copyStack.empty()) {
+            reverseStack.push(copyStack.pop());
+        }
+
+        while (!reverseStack.empty()) {
+            Tile tile = reverseStack.pop();
+            state.append(tile.getBoard());
+            state.append(STATE_DELIMITER);
+            state.append(tile.getIndex());
+            state.append(STATE_DELIMITER);
+        }
+
+        return state.toString();
+    }
+
+    public void resumeGame(String state, boolean isRoundTwo) {
+        Scanner scanner = new Scanner(state);
+
+        scanner.useDelimiter(Character.toString(STATE_DELIMITER));
+        mBoardFinished = scanner.nextInt() == 1;
+        mBoardValid = scanner.nextInt() == 1;
+
+        String tiles = scanner.next();
+        Log.d(TAG, "resumeGame: " + tiles);
+
+        for (int i = 0; i < 9; i++) {
+            mGameTiles[i].setLetter(tiles.charAt(i));
+        }
+
+        mSelectedTiles = new Stack<>();
+
+        while (scanner.hasNextInt()) {
+            int index = scanner.nextInt();
+            Tile nextTile = mGameTiles[index];
+
+            if (mBoardFinished && mBoardValid)
+                nextTile.setValid();
+            else if (mBoardFinished && !mBoardValid)
+                nextTile.setInvalid();
+            else
+                nextTile.setSelected();
+
+            mCurrentWord.append(nextTile.getLetter());
+            mSelectedTiles.push(nextTile);
+        }
+    }
+
+    public void resumeRoundTwo() {
+        for (Tile tile : mGameTiles) {
+            if (tile.hasLetter())
+                tile.setUnselected();
+            else
+                tile.setHidden();
+        }
+    }
+
+
+    public void pushRoundTwoState(int index) {
+        Tile tile = mGameTiles[index];
+
+        mSelectedTilesRoundTwo.push(tile);
+        mRoundTwoWord.append(tile.getLetter());
+        tile.setSelected();
     }
 
     // TODO: make this better
@@ -138,7 +247,8 @@ public class GameBoard {
 
     // Add the letter to mCurrentWord
     // OR pop back to the current tile
-    private void updateSelection(int index, StringBuilder currentWord, Stack<Tile> letterStack) {
+    private void updateSelection(int index, StringBuilder
+            currentWord, Stack<Tile> letterStack) {
         Tile tile = mGameTiles[index];
 
         if (!tile.selected()) {
@@ -264,8 +374,7 @@ public class GameBoard {
     // Color the current word green or red
     private void finishTiles(boolean valid) {
         mBoardValid = valid;
-        Stack<Tile> tilesCopy = mSelectedTiles;
-
+        Stack<Tile> tilesCopy = (Stack<Tile>) mSelectedTiles.clone();
         while (!tilesCopy.empty()) {
             Tile tile = tilesCopy.pop();
 
@@ -281,6 +390,7 @@ public class GameBoard {
     public void startRoundTwo() {
         mBoardFinished = false;
         mRoundTwoWord.delete(0, mRoundTwoWord.length());
+        mSelectedTilesRoundTwo = new Stack<>();
 
         for (int i = 0; i < 9; i++) {
             Tile tile = mGameTiles[i];

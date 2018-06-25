@@ -27,6 +27,14 @@ public class WordGameMenuActivity extends AppCompatActivity {
 
         // Resume game button
         View resumeGame = findViewById(R.id.scroggle_resume_game_button);
+        resumeGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(WordGameMenuActivity.this, WordGameActivity.class);
+                intent.putExtra(WordGameActivity.KEY_RESTORE, true);
+                startActivity(intent);
+            }
+        });
 
         // Acknowledgments button
         View ackButton = findViewById(R.id.scroggle_ack_button);

@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Scanner;
+import java.util.Stack;
+
 public class WordGameFragment extends Fragment {
 
     final static String TAG = "WordGameFragment";
@@ -19,7 +22,7 @@ public class WordGameFragment extends Fragment {
 
     public enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO}
 
-    public static GAME_STATE CURRENT_STATE = GAME_STATE.ROUND_ONE;
+    public static GAME_STATE CURRENT_STATE;
 
     private View mRootView;
     private TextView mDisplayTextView;
@@ -46,6 +49,7 @@ public class WordGameFragment extends Fragment {
     }
 
     public void initGame() {
+        CURRENT_STATE = GAME_STATE.ROUND_ONE;
         String[] words = getRandomWords();
 
         // Set up the tiles
@@ -82,18 +86,16 @@ public class WordGameFragment extends Fragment {
 
     private void doRoundOneTurn() {
         int selectedBoard = GameBoard.lastBoardSelected;
+
         if (mGameBoards[selectedBoard].finishWord()) {
             mWordsLeft--;
 
-            mDisplayTextView.setText("Find " + mWordsLeft + " words");
-
             mScore += mGameBoards[selectedBoard].getBoardScore();
             redisplayScore();
+            redisplayText();
 
             // Time to do round 2
             if (mWordsLeft == 0) {
-                mDisplayTextView.setText("Round 2!");
-                mMakeMoveButton.setText("Go");
                 CURRENT_STATE = GAME_STATE.CHANGE_ROUND;
             }
         }
@@ -106,8 +108,8 @@ public class WordGameFragment extends Fragment {
             mGameBoards[i].startRoundTwo();
         }
 
-        mMakeMoveButton.setText("Select");
-        mDisplayTextView.setText("Spell a word");
+        redisplayText();
+
         CURRENT_STATE = GAME_STATE.ROUND_TWO;
     }
 
@@ -123,15 +125,35 @@ public class WordGameFragment extends Fragment {
                 mGameBoards[i].checkIfEmpty();
             }
 
-            mDisplayTextView.setText("Spell a word");
+            redisplayText();
         }
-
-
     }
 
     private void redisplayScore() {
         String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
         mScoreTextView.setText(scoreLabel);
+    }
+
+    private void redisplayText() {
+        switch (CURRENT_STATE) {
+            case ROUND_ONE:
+                if (mWordsLeft > 0) {
+                    mDisplayTextView.setText("Find " + mWordsLeft + " words");
+                } else {
+                    mDisplayTextView.setText("Round 2!");
+                    mMakeMoveButton.setText("Go");
+                }
+                break;
+
+            case ROUND_TWO:
+                mDisplayTextView.setText("Spell a word");
+                break;
+
+            case CHANGE_ROUND:
+                mMakeMoveButton.setText("Select");
+                mDisplayTextView.setText("Spell a word");
+                break;
+        }
     }
 
 
@@ -151,5 +173,79 @@ public class WordGameFragment extends Fragment {
         }
 
         return randomWords;
+    }
+
+    public String getGameState() {
+        StringBuilder state = new StringBuilder();
+        char delim = '<';
+
+        state.append(CURRENT_STATE == GAME_STATE.ROUND_ONE ? "1" : "2");
+        state.append(delim);
+
+        state.append(mScore);
+        state.append(delim);
+
+        state.append(mWordsLeft);
+        state.append(delim);
+
+        for (int i = 0; i < 9; i++) {
+            state.append(mGameBoards[i].getGameState());
+            state.append(delim);
+        }
+
+        if (CURRENT_STATE == GAME_STATE.ROUND_TWO) {
+            state.append(GameBoard.getRoundTwoState());
+            state.append(delim);
+        }
+
+        Log.d(TAG, "getGameState: " + state);
+        return state.toString();
+    }
+
+    public void resumeGame(String state) {
+        Scanner scanner = new Scanner(state);
+        scanner.useDelimiter("<");
+
+        if (scanner.nextInt() == 1)
+            CURRENT_STATE = GAME_STATE.ROUND_ONE;
+        else
+            CURRENT_STATE = GAME_STATE.ROUND_TWO;
+
+        mScore = scanner.nextInt();
+        mWordsLeft = scanner.nextInt();
+
+        boolean isRoundTwo = CURRENT_STATE == GAME_STATE.ROUND_TWO;
+
+        for (int i = 0; i < 9; i++) {
+            mGameBoards[i].resumeGame(scanner.next(), isRoundTwo);
+        }
+
+        // We just switch to round 2
+        if (isRoundTwo && !scanner.hasNext()) {
+            for (GameBoard gb : mGameBoards) {
+                gb.startRoundTwo();
+            }
+        } else {
+            for (GameBoard gb : mGameBoards) {
+                gb.resumeRoundTwo();
+            }
+
+            String roundTwoState = scanner.next();
+
+            GameBoard.mSelectedTilesRoundTwo = new Stack<>();
+            GameBoard.mRoundTwoWord = new StringBuilder();
+
+            Scanner s2 = new Scanner(roundTwoState);
+            s2.useDelimiter(Character.toString(GameBoard.STATE_DELIMITER));
+
+            while (s2.hasNext()) {
+                int boardIndex = s2.nextInt();
+                int tileIndex = s2.nextInt();
+                mGameBoards[boardIndex].pushRoundTwoState(tileIndex);
+            }
+        }
+
+        redisplayScore();
+        redisplayText();
     }
 }

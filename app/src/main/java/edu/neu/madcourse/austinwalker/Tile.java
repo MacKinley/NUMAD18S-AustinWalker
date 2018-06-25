@@ -35,12 +35,15 @@ public class Tile {
         Button tile = (Button) mView;
         tile.setText(new char[]{mLetter}, 0, 1);
 
-        setUnselected();
+        if (mLetter != ' ')
+            setUnselected();
+        else
+            setHidden();
     }
 
     public void removeLetter() {
         setLetter(' ');
-        mView.getBackground().setLevel(0);
+       setHidden();
     }
 
     public int getIndex() {
@@ -108,6 +111,10 @@ public class Tile {
 
     public boolean selected() {
         return mSelected;
+    }
+
+    public void setHidden() {
+        mView.getBackground().setLevel(0);
     }
 
     public void setSelected() {

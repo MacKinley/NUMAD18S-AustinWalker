@@ -1,9 +1,13 @@
 package edu.neu.madcourse.austinwalker;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -150,6 +154,15 @@ public class GameBoard {
         }
     }
 
+    public static void resetRoundTwo() {
+        while (!mSelectedTilesRoundTwo.empty()) {
+            Tile tile = mSelectedTilesRoundTwo.pop();
+            tile.setUnselected();
+        }
+
+        mRoundTwoWord.delete(0, mRoundTwoWord.length());
+    }
+
 
     public void pushRoundTwoState(int index) {
         Tile tile = mGameTiles[index];
@@ -200,6 +213,7 @@ public class GameBoard {
     private void doRoundOneTurn(int tileIndex) {
         if (canSelectOrUnselect(tileIndex)) {
             updateSelection(tileIndex, mCurrentWord, mSelectedTiles);
+            vibrate(50);
             lastBoardSelected = mBoardId;
         }
     }
@@ -208,6 +222,7 @@ public class GameBoard {
         if (canSelectOrUnselectRoundTwo(tileIndex)) {
             // only one at a time
             updateSelection(tileIndex, mRoundTwoWord, mSelectedTilesRoundTwo);
+            vibrate(50);
         }
     }
 
@@ -446,6 +461,17 @@ public class GameBoard {
         // Replace with a random letter
         if (empty) {
             mGameTiles[4].setLetter(getRandomLetter());
+        }
+    }
+
+    public static void vibrate(int duration) {
+        Vibrator v = (Vibrator) mGame.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+        }else{
+            //deprecated in API 26
+            v.vibrate(duration);
         }
     }
 }

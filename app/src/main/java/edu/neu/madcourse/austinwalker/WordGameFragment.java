@@ -87,6 +87,7 @@ public class WordGameFragment extends Fragment {
         int selectedBoard = GameBoard.lastBoardSelected;
 
         if (mGameBoards[selectedBoard].finishWord()) {
+            GameBoard.vibrate(300);
             mWordsLeft--;
 
             mScore += mGameBoards[selectedBoard].getBoardScore();
@@ -125,7 +126,12 @@ public class WordGameFragment extends Fragment {
             }
 
             redisplayText();
+        } else {
+            GameBoard.resetRoundTwo();
+            mDisplayTextView.setText("Not a word!");
         }
+
+        GameBoard.vibrate(300);
     }
 
     private void redisplayScore() {

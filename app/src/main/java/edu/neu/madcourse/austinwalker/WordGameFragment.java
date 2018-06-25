@@ -37,7 +37,6 @@ public class WordGameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: save state
         setRetainInstance(true);
         initGame();
     }
@@ -220,12 +219,12 @@ public class WordGameFragment extends Fragment {
             mGameBoards[i].resumeGame(scanner.next(), isRoundTwo);
         }
 
-        // We just switch to round 2
+        // We just switched to round 2
         if (isRoundTwo && !scanner.hasNext()) {
             for (GameBoard gb : mGameBoards) {
                 gb.startRoundTwo();
             }
-        } else {
+        } else if (scanner.hasNext()){
             for (GameBoard gb : mGameBoards) {
                 gb.resumeRoundTwo();
             }

@@ -1,6 +1,8 @@
 package edu.neu.madcourse.austinwalker;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ public class WordGameFragment extends Fragment {
     final private int ROUND_SECONDS = 90;
 
     static private int mLargeIds[] = {R.id.largeTile1, R.id.largeTile2, R.id.largeTile3, R.id.largeTile4, R.id.largeTile5, R.id.largeTile6, R.id.largeTile7, R.id.largeTile8, R.id.largeTile9};
+    private AlertDialog mHowToPlayDialog;
 
     public enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO, GAME_OVER}
 
@@ -55,13 +58,21 @@ public class WordGameFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        startTimer();
+        TextView timer = mRootView.findViewById(R.id.scroggle_timer_view);
+        timer.setText(Long.toString(mSecondsLeft));
+
+        if (CURRENT_STATE == GAME_STATE.ROUND_ONE || CURRENT_STATE == GAME_STATE.ROUND_TWO)
+            startTimer();
     }
 
     public void onPause() {
         super.onPause();
 
-        mTimer.cancel();
+        if (mHowToPlayDialog != null)
+            mHowToPlayDialog.dismiss();
+
+        if (mTimer != null)
+            mTimer.cancel();
     }
 
     private void startTimer() {
@@ -111,6 +122,7 @@ public class WordGameFragment extends Fragment {
         mScoreTextView = (TextView) mRootView.findViewById(R.id.scroggle_display_score);
         mMakeMoveButton = (Button) rootView.findViewById(R.id.scroggle_finish_word_button);
 
+
         for (int i = 0; i < 9; i++) {
             View outer = rootView.findViewById(mLargeIds[i]);
             mGameBoards[i].setView(rootView, outer);
@@ -123,7 +135,7 @@ public class WordGameFragment extends Fragment {
                     doRoundOneTurn();
                 } else if (CURRENT_STATE == GAME_STATE.CHANGE_ROUND) {
                     changeRound();
-                } else if (CURRENT_STATE == GAME_STATE.ROUND_TWO){
+                } else if (CURRENT_STATE == GAME_STATE.ROUND_TWO) {
                     doRoundTwoTurn();
                 } else {
                     restartGame();
@@ -152,18 +164,27 @@ public class WordGameFragment extends Fragment {
     }
 
     private void changeRound() {
-        // pop instruction toast
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Round Two");
+        builder.setMessage(R.string.scroggle_round_two_text);
+        builder.setCancelable(false);
+        builder.setPositiveButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSecondsLeft += ROUND_SECONDS; // Get some extra time
+                        startTimer();
 
-        for (int i = 0; i < 9; i++) {
-            mGameBoards[i].startRoundTwo();
-        }
+                        CURRENT_STATE = GAME_STATE.ROUND_TWO;
+                        redisplayText();
 
-        mSecondsLeft += ROUND_SECONDS; // Get some extra time
-        startTimer();
+                        for (int i = 0; i < 9; i++) {
+                            mGameBoards[i].startRoundTwo();
+                        }
+                    }
+                });
 
-        redisplayText();
-
-        CURRENT_STATE = GAME_STATE.ROUND_TWO;
+        mHowToPlayDialog = builder.show();
     }
 
     private void doRoundTwoTurn() {
@@ -211,20 +232,19 @@ public class WordGameFragment extends Fragment {
             case ROUND_ONE:
                 if (mWordsLeft > 0) {
                     mDisplayTextView.setText("Find " + mWordsLeft + " words");
-                } else {
-                    mDisplayTextView.setText("Round 2!");
-                    mMakeMoveButton.setText("Go");
+                    break;
                 }
+                // Fall through if no words left
+
+            case CHANGE_ROUND:
+                mDisplayTextView.setText("Round 2!");
+                mMakeMoveButton.setText("Go");
                 break;
 
             case ROUND_TWO:
                 mDisplayTextView.setText("Spell a word");
                 break;
 
-            case CHANGE_ROUND:
-                mMakeMoveButton.setText("Select");
-                mDisplayTextView.setText("Spell a word");
-                break;
 
             case GAME_OVER:
                 mDisplayTextView.setText("Game over!");
@@ -254,7 +274,23 @@ public class WordGameFragment extends Fragment {
         StringBuilder state = new StringBuilder();
         char delim = '<';
 
-        state.append(CURRENT_STATE == GAME_STATE.ROUND_ONE ? "1" : "2");
+        switch (CURRENT_STATE) {
+            case ROUND_ONE:
+                state.append("1");
+                break;
+
+            case CHANGE_ROUND:
+                state.append("2");
+                break;
+
+            case ROUND_TWO:
+                state.append("3");
+                break;
+
+            default:
+                state.append("4");
+        }
+
         state.append(delim);
 
         state.append(mScore);
@@ -284,16 +320,29 @@ public class WordGameFragment extends Fragment {
         Scanner scanner = new Scanner(state);
         scanner.useDelimiter("<");
 
-        if (scanner.nextInt() == 1)
-            CURRENT_STATE = GAME_STATE.ROUND_ONE;
-        else
-            CURRENT_STATE = GAME_STATE.ROUND_TWO;
+        switch (scanner.nextInt()) {
+            case 1:
+                CURRENT_STATE = GAME_STATE.ROUND_ONE;
+                break;
+
+            case 2:
+                CURRENT_STATE = GAME_STATE.CHANGE_ROUND;
+                break;
+
+            case 3:
+                CURRENT_STATE = GAME_STATE.ROUND_TWO;
+                break;
+
+            default:
+                CURRENT_STATE = GAME_STATE.GAME_OVER;
+
+        }
 
         mScore = scanner.nextInt();
         mSecondsLeft = scanner.nextInt();
         mWordsLeft = scanner.nextInt();
 
-        boolean isRoundTwo = CURRENT_STATE == GAME_STATE.ROUND_TWO;
+        boolean isRoundTwo = CURRENT_STATE == GAME_STATE.ROUND_TWO || CURRENT_STATE == GAME_STATE.GAME_OVER;
 
         for (int i = 0; i < 9; i++) {
             mGameBoards[i].resumeGame(scanner.next(), isRoundTwo);

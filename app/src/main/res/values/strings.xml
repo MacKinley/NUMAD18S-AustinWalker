@@ -18,4 +18,5 @@
     <string name="scroggle_resume_game_label">Resume Game</string>
     <string name="scroggle_finish_word_label">Select</string>
     <string name="scroggle_score_label">Score: %1$d</string>
+    <string name="scroggle_round_two_text">In this round, you need to spell words using the larger grid. Choose a letter from one of the squares, and then add letters from adjacent squares. You can pick from a square multiple times, but not sequentially.\n\nWhen squares become empty, you\'ll get a new random letter.\n\nEach word is scored as the length of the word plus the scrabble score per letter, shown below:\n\n1 point: A E I O N R T L S\n2 points: D G\n3 points: B C M P\n4 points: F H V W Y\n5 points: K\n8 points: J X\n10 points: Q Z</string>
 </resources>

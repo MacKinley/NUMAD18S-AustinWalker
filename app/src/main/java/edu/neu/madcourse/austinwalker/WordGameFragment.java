@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,11 @@ public class WordGameFragment extends Fragment {
 
     final static String TAG = "WordGameFragment";
 
+    final private int ROUND_SECONDS = 90;
+
     static private int mLargeIds[] = {R.id.largeTile1, R.id.largeTile2, R.id.largeTile3, R.id.largeTile4, R.id.largeTile5, R.id.largeTile6, R.id.largeTile7, R.id.largeTile8, R.id.largeTile9};
 
-    public enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO}
+    public enum GAME_STATE {ROUND_ONE, CHANGE_ROUND, ROUND_TWO, GAME_OVER}
 
     public static GAME_STATE CURRENT_STATE;
 
@@ -29,9 +32,11 @@ public class WordGameFragment extends Fragment {
     private TextView mScoreTextView;
     private Button mMakeMoveButton;
     private GameBoard mGameBoards[] = new GameBoard[9];
+    private long mSecondsLeft;
+    private CountDownTimer mTimer;
 
-    private int mWordsLeft = 9;
-    private int mScore = 0;
+    private int mWordsLeft;
+    private int mScore;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,44 @@ public class WordGameFragment extends Fragment {
         return rootView;
     }
 
+    public void onResume() {
+        super.onResume();
+
+        startTimer();
+    }
+
+    public void onPause() {
+        super.onPause();
+
+        mTimer.cancel();
+    }
+
+    private void startTimer() {
+        mTimer = new CountDownTimer(mSecondsLeft * 1000, 1000) {
+
+            TextView timerView = mRootView.findViewById(R.id.scroggle_timer_view);
+
+            public void onTick(long millisUntilFinished) {
+                mSecondsLeft = millisUntilFinished / 1000;
+                timerView.setText(Long.toString(mSecondsLeft));
+            }
+
+            public void onFinish() {
+                timerView.setText("0");
+
+                if (CURRENT_STATE == GAME_STATE.ROUND_ONE) {
+                    mWordsLeft = 0;
+                    redisplayText();
+                    CURRENT_STATE = GAME_STATE.CHANGE_ROUND;
+                } else {
+                    CURRENT_STATE = GAME_STATE.GAME_OVER;
+                    redisplayText();
+                }
+
+            }
+        }.start();
+    }
+
     public void initGame() {
         CURRENT_STATE = GAME_STATE.ROUND_ONE;
         String[] words = getRandomWords(); // TODO: Technically it's doing this on resume as well...
@@ -55,6 +98,10 @@ public class WordGameFragment extends Fragment {
         for (int i = 0; i < 9; i++) {
             mGameBoards[i] = new GameBoard(this, i, words[i]);
         }
+
+        mSecondsLeft = ROUND_SECONDS;
+        mScore = 0;
+        mWordsLeft = 9;
     }
 
     private void initViews(final View rootView) {
@@ -76,8 +123,10 @@ public class WordGameFragment extends Fragment {
                     doRoundOneTurn();
                 } else if (CURRENT_STATE == GAME_STATE.CHANGE_ROUND) {
                     changeRound();
-                } else {
+                } else if (CURRENT_STATE == GAME_STATE.ROUND_TWO){
                     doRoundTwoTurn();
+                } else {
+                    restartGame();
                 }
             }
         });
@@ -108,6 +157,9 @@ public class WordGameFragment extends Fragment {
             mGameBoards[i].startRoundTwo();
         }
 
+        mSecondsLeft = ROUND_SECONDS;
+        startTimer();
+
         redisplayText();
 
         CURRENT_STATE = GAME_STATE.ROUND_TWO;
@@ -134,6 +186,20 @@ public class WordGameFragment extends Fragment {
         GameBoard.vibrate(300);
     }
 
+    private void restartGame() {
+        initGame();
+
+        for (int i = 0; i < 9; i++) {
+            View outer = mRootView.findViewById(mLargeIds[i]);
+            mGameBoards[i].setView(mRootView, outer);
+        }
+
+        redisplayText();
+        redisplayScore();
+
+        startTimer();
+    }
+
     private void redisplayScore() {
         String scoreLabel = getResources().getString(R.string.scroggle_score_label, mScore);
         mScoreTextView.setText(scoreLabel);
@@ -158,9 +224,12 @@ public class WordGameFragment extends Fragment {
                 mMakeMoveButton.setText("Select");
                 mDisplayTextView.setText("Spell a word");
                 break;
+
+            case GAME_OVER:
+                mDisplayTextView.setText("Game over!");
+                mMakeMoveButton.setText("Restart");
         }
     }
-
 
     private String[] getRandomWords() {
         String[] randomWords = new String[9];
@@ -190,6 +259,9 @@ public class WordGameFragment extends Fragment {
         state.append(mScore);
         state.append(delim);
 
+        state.append(mSecondsLeft);
+        state.append(delim);
+
         state.append(mWordsLeft);
         state.append(delim);
 
@@ -217,6 +289,7 @@ public class WordGameFragment extends Fragment {
             CURRENT_STATE = GAME_STATE.ROUND_TWO;
 
         mScore = scanner.nextInt();
+        mSecondsLeft = scanner.nextInt();
         mWordsLeft = scanner.nextInt();
 
         boolean isRoundTwo = CURRENT_STATE == GAME_STATE.ROUND_TWO;
@@ -230,7 +303,7 @@ public class WordGameFragment extends Fragment {
             for (GameBoard gb : mGameBoards) {
                 gb.startRoundTwo();
             }
-        } else if (scanner.hasNext()){
+        } else if (scanner.hasNext()) {
             for (GameBoard gb : mGameBoards) {
                 gb.resumeRoundTwo();
             }

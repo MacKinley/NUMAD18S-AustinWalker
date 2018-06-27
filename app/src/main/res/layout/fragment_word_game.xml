@@ -40,10 +40,10 @@
         app:layout_constraintBottom_toTopOf="@+id/scroggle_finish_word_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/scroggle_timer_view" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/scroggle_timer_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
@@ -64,7 +64,7 @@
         android:text="Score: 0"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/include"
-        app:layout_constraintEnd_toStartOf="@+id/textView"
+        app:layout_constraintEnd_toStartOf="@+id/scroggle_timer_view"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

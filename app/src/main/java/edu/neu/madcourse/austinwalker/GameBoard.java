@@ -184,7 +184,7 @@ public class GameBoard {
 
         for (int i = 0; i < 9; i++) {
             int next = tileOrder[i];
-            boardState[i] = word.charAt(next);
+            boardState[next] = word.charAt(i);
         }
 
         return boardState;
@@ -373,41 +373,44 @@ public class GameBoard {
 
         stack.push(rand.nextInt(9));
 
-            while (!stack.empty()) {
-                int current = stack.pop();
-                if (visited[current])
-                    continue;
+        while (!stack.empty()) {
+            int current = stack.pop();
+            if (visited[current])
+                continue;
 
-                // We're stuck! Go back to where we can try this node
-                if (!path.empty() && !isAdjacent(current, path.peek())) {
+            // We're stuck! Go back to where we can try this node
+            if (!path.empty() && !isAdjacent(current, path.peek())) {
+                visited[path.pop()] = false;
+
+                // Once more to make sure we don't get stuck again
+                if (!path.empty())
                     visited[path.pop()] = false;
 
-                    // Once more to make sure we don't get stuck again
-                    if (!path.empty())
-                        visited[path.pop()] = false;
+                if (!path.empty())
+                    Log.v(TAG, "findRandomPath: popped back to=" + path.peek());
 
-                    if (!path.empty())
-                        Log.d(TAG, "findRandomPath: popped back to=" + path.peek());
-
-                    continue;
-                }
-
-                visited[current] = true;
-                path.push(current);
-                Log.d(TAG, "findRandomPath: current=" + current);
-
-                for (int neighbor : shuffleNeighors(current)) {
-                    if (!visited[neighbor]) {
-                        stack.push(neighbor);
-                    }
-                }
+                continue;
             }
 
+            visited[current] = true;
+            path.push(current);
+            Log.v(TAG, "findRandomPath: current=" + current);
+
+            for (int neighbor : shuffleNeighors(current)) {
+                if (!visited[neighbor]) {
+                    stack.push(neighbor);
+                }
+            }
+        }
+
         int[] arr = new int[path.size()];
+        StringBuilder logString = new StringBuilder();
         for (int i = 0; i < path.size(); i++) {
-            Log.d(TAG, "findRandomPath: finalPath=" + path.elementAt(i));
+            logString.append(path.elementAt(i));
             arr[i] = path.elementAt(i);
         }
+
+        Log.d(TAG, "findRandomPath: path=" + logString.toString());
 
         return arr;
     }

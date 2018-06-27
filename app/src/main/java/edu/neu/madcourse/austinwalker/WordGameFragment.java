@@ -145,6 +145,7 @@ public class WordGameFragment extends Fragment {
 
             // Time to do round 2
             if (mWordsLeft == 0) {
+                mTimer.cancel();
                 CURRENT_STATE = GAME_STATE.CHANGE_ROUND;
             }
         }
@@ -157,7 +158,7 @@ public class WordGameFragment extends Fragment {
             mGameBoards[i].startRoundTwo();
         }
 
-        mSecondsLeft = ROUND_SECONDS;
+        mSecondsLeft += ROUND_SECONDS; // Get some extra time
         startTimer();
 
         redisplayText();

@@ -49,7 +49,7 @@ public class WordGameFragment extends Fragment {
 
     public void initGame() {
         CURRENT_STATE = GAME_STATE.ROUND_ONE;
-        String[] words = getRandomWords();
+        String[] words = getRandomWords(); // TODO: Technically it's doing this on resume as well...
 
         // Set up the tiles
         for (int i = 0; i < 9; i++) {
@@ -86,7 +86,7 @@ public class WordGameFragment extends Fragment {
     private void doRoundOneTurn() {
         int selectedBoard = GameBoard.lastBoardSelected;
 
-        if (mGameBoards[selectedBoard].finishWord()) {
+        if (selectedBoard != -1 && mGameBoards[selectedBoard].finishWord()) {
             GameBoard.vibrate(300);
             mWordsLeft--;
 

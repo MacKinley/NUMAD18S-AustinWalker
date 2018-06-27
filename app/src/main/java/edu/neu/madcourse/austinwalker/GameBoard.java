@@ -13,10 +13,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 public class GameBoard {
 
@@ -25,6 +26,7 @@ public class GameBoard {
     public static char STATE_DELIMITER = '/';
 
     private static int tileIds[] = {R.id.smallTile1, R.id.smallTile2, R.id.smallTile3, R.id.smallTile4, R.id.smallTile5, R.id.smallTile6, R.id.smallTile7, R.id.smallTile8, R.id.smallTile9};
+    private static final int[][] ADJACENT_TILES = {{1, 4, 3}, {2, 3, 4, 5, 0}, {1, 4, 5}, {0, 1, 4, 7, 6}, {0, 3, 2, 5, 8, 7, 6, 1}, {2, 1, 4, 7, 8}, {3, 4, 7}, {6, 3, 8, 5, 4}, {7, 4, 5}};
     private static ToneGenerator successBeep = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
     private static WordGameFragment mGame;
 
@@ -163,7 +165,6 @@ public class GameBoard {
         mRoundTwoWord.delete(0, mRoundTwoWord.length());
     }
 
-
     public void pushRoundTwoState(int index) {
         Tile tile = mGameTiles[index];
 
@@ -172,18 +173,19 @@ public class GameBoard {
         tile.setSelected();
     }
 
-    // TODO: make this better
     private char[] shuffleWord(String word) {
+        int[] tileOrder = findRandomPath();
         char[] boardState = new char[9];
-        boardState[0] = word.charAt(0);
-        boardState[1] = word.charAt(1);
-        boardState[2] = word.charAt(2);
-        boardState[3] = word.charAt(5);
-        boardState[4] = word.charAt(4);
-        boardState[5] = word.charAt(3);
-        boardState[6] = word.charAt(6);
-        boardState[7] = word.charAt(7);
-        boardState[8] = word.charAt(8);
+
+        // Hack: sometimes findRandomPath gives up early
+        while (tileOrder.length != 9) {
+            tileOrder = findRandomPath();
+        }
+
+        for (int i = 0; i < 9; i++) {
+            int next = tileOrder[i];
+            boardState[i] = word.charAt(next);
+        }
 
         return boardState;
     }
@@ -353,37 +355,74 @@ public class GameBoard {
 
     // Simple check for tiles that are touching each other
     public static boolean isAdjacent(int i, int j) {
-        switch (i) {
-            case 0:
-                return j == 1 || j == 3 || j == 4;
+        int[] neighbors = ADJACENT_TILES[i];
 
-            case 1:
-                return j == 0 || j == 3 || j == 4 || j == 5 || j == 2;
-
-            case 2:
-                return j == 1 || j == 4 || j == 5;
-
-            case 3:
-                return j == 0 || j == 1 || j == 4 || j == 6 || j == 7;
-
-            case 4:
-                return j == 0 || j == 1 || j == 2 || j == 3 || j == 5 || j == 6 || j == 7 || j == 8;
-
-            case 5:
-                return j == 1 || j == 2 || j == 4 || j == 7 || j == 8;
-
-            case 6:
-                return j == 3 || j == 4 || j == 7;
-
-            case 7:
-                return j == 6 || j == 3 || j == 4 || j == 5 || j == 8;
-
-            case 8:
-                return j == 5 || j == 4 || j == 7;
-
-            default:
-                return false;
+        for (int n : neighbors) {
+            if (n == j)
+                return true;
         }
+
+        return false;
+    }
+
+    private int[] findRandomPath() {
+        Random rand = new Random();
+        Stack<Integer> stack = new Stack<>();
+        Stack<Integer> path = new Stack<>();
+        boolean[] visited = {false, false, false, false, false, false, false, false, false};
+
+        stack.push(rand.nextInt(9));
+
+            while (!stack.empty()) {
+                int current = stack.pop();
+                if (visited[current])
+                    continue;
+
+                // We're stuck! Go back to where we can try this node
+                if (!path.empty() && !isAdjacent(current, path.peek())) {
+                    visited[path.pop()] = false;
+
+                    // Once more to make sure we don't get stuck again
+                    if (!path.empty())
+                        visited[path.pop()] = false;
+
+                    if (!path.empty())
+                        Log.d(TAG, "findRandomPath: popped back to=" + path.peek());
+
+                    continue;
+                }
+
+                visited[current] = true;
+                path.push(current);
+                Log.d(TAG, "findRandomPath: current=" + current);
+
+                for (int neighbor : shuffleNeighors(current)) {
+                    if (!visited[neighbor]) {
+                        stack.push(neighbor);
+                    }
+                }
+            }
+
+        int[] arr = new int[path.size()];
+        for (int i = 0; i < path.size(); i++) {
+            Log.d(TAG, "findRandomPath: finalPath=" + path.elementAt(i));
+            arr[i] = path.elementAt(i);
+        }
+
+        return arr;
+    }
+
+    private ArrayList<Integer> shuffleNeighors(int tileIndex) {
+        int[] neighbors = ADJACENT_TILES[tileIndex];
+        ArrayList<Integer> list = new ArrayList<>(neighbors.length);
+
+        for (int i : neighbors) {
+            list.add(i);
+        }
+
+        Collections.shuffle(list);
+
+        return list;
     }
 
     // Color the current word green or red
@@ -469,7 +508,7 @@ public class GameBoard {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
-        }else{
+        } else {
             //deprecated in API 26
             v.vibrate(duration);
         }

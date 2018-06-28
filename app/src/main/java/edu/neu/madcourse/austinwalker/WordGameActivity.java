@@ -23,10 +23,6 @@ public class WordGameActivity extends AppCompatActivity {
         }
     }
 
-    public void restartGame() {
-//        mGameFragment.restartGame();
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
